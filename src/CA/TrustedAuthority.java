@@ -8,7 +8,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 
 public class TrustedAuthority {
-    private HashMap<String,Element> privateKeys;
+    private HashMap<String,Element> privateKeys = new HashMap<String,Element>();
     private Element masterKey;
     public BonehAndFranklin parameters;
 
