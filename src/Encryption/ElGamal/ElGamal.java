@@ -1,9 +1,8 @@
-package Encryption;
+package Encryption.ElGamal;
 
-import Encryption.CipherText;
 import it.unisa.dia.gas.jpbc.*;
 import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
-import Encryption.KeyPair;
+
 public class ElGamal {
 
     public static void main(String[] args) {
@@ -18,17 +17,13 @@ public class ElGamal {
 
         //Element decryptedMessage = decrypt(cipherText, keyPair.getPrivateKey(), pairing);
 
-
     }
 
     public static KeyPair generateKeyPair(Pairing pairing) {
-        // Generate a new random G1 element as the private key
         Element privateKey = pairing.getG1().newRandomElement();
 
-        // Compute the corresponding public key
         Element publicKey = pairing.getG2().newElement().setFromHash(privateKey.toBytes(), 0, privateKey.toBytes().length);
 
-        // Return the key pair
         return new KeyPair(privateKey, publicKey);
     }
 
