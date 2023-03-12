@@ -22,10 +22,12 @@ public class MailTest {
         System.out.println("Début des tests");
         MailHandler handler = new MailHandler(
                 "smtp.gmail.com",
+                "imap.gmail.com",
                 loginProperties.getProperty("user"),
                 loginProperties.getProperty("password")
         );
-        handler.testMail();
+//        handler.testMail();
+        handler.checkMails();
         System.out.println("Fin des tests");
     }
 }
