@@ -14,19 +14,19 @@ public class ElGamal {
         Element generator = pairing.getZr().newRandomElement();
 
         KeyPair keyPair = generateKeyPair(pairing,generator);
-        String str = "123456";
+        String str = "xxxxxxxxxxxxxxxx";
         Element message = pairing.getZr().newElement();
         message.setFromBytes(str.getBytes());
 
 
 
-        CipherText cipherText = encrypt(message, keyPair.getPublicKey(), pairing,generator);
+        CipherText cipherText = encrypt(message, keyPair.publicKey(), pairing,generator);
 
-        Element decryptedMessage = decrypt(cipherText, keyPair.getPrivateKey());
+        Element decryptedMessage = decrypt(cipherText, keyPair.privateKey());
         System.out.println("Message: " + Base64.getEncoder().encodeToString(message.toBytes()));
-        System.out.println("C1: " + Base64.getEncoder().encodeToString(cipherText.getC1().toBytes()));
-        System.out.println("C2: " + Base64.getEncoder().encodeToString(cipherText.getC2().toBytes()));
-        System.out.println(" message décryptéé: " + Base64.getEncoder().encodeToString(decryptedMessage.toBytes()));
+        System.out.println("C1: " + Base64.getEncoder().encodeToString(cipherText.c1().toBytes()));
+        System.out.println("C2: " + Base64.getEncoder().encodeToString(cipherText.c2().toBytes()));
+        System.out.println("Messagz décrypté: " + Base64.getEncoder().encodeToString(decryptedMessage.toBytes()));
 
 
         if (message.isEqual(decryptedMessage)) {
@@ -56,9 +56,9 @@ public class ElGamal {
     public static Element decrypt(CipherText cipherText, Element privateKey) {
 
 
-        Element decryptionKey = cipherText.getC1().duplicate().mulZn(privateKey);
+        Element decryptionKey = cipherText.c1().duplicate().mulZn(privateKey);
         Element invertDecryptionKey = decryptionKey.duplicate().invert();
-        Element message = invertDecryptionKey.mulZn(cipherText.getC2().duplicate());
+        Element message = invertDecryptionKey.mulZn(cipherText.c2().duplicate());
 
         return message;
     }
