@@ -96,8 +96,8 @@ public class IBEscheme {
         Element privatekey = Zr.newRandomElement();
         Field G = pairing.getG1();
         Element generateur = Zr.newRandomElement();
-        Element[] publickey = PKAL_GAMAL(generateur, privatekey);
-        Arraylist<String>cyphertext =chiffrement("Message à chiffrer avec l'algorithme d'AL-GAMAL.", public_key);
+      /*  Element[] publickey = PKAL_GAMAL(generateur, privatekey);
+        Arraylist<String>cyphertext =chiffrement("Message à chiffrer avec l'algorithme d'AL-GAMAL.", public_key);*/
     }
 
 

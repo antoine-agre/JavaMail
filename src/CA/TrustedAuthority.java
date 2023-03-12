@@ -24,7 +24,6 @@ public class TrustedAuthority {
 
         Element privateKey = msk.mul(id.duplicate()).getImmutable();
         privateKeys.put(email, privateKey);
-
     }
 
 

@@ -17,7 +17,6 @@ public class BonehAndFranklin {
 
         this.g = pairing.getG1().newRandomElement();
         this.P = pairing.getG2().newRandomElement();
-        this.publicKeys = new HashMap<String,Element>();
     }
 
     protected Pairing getPairing() {
