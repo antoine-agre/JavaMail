@@ -1,7 +1,11 @@
+package CA;
+
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Field;
 import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
+
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.lang.Math;
 import java.security.MessageDigest;
@@ -29,19 +33,19 @@ public class IBEscheme {
         this.private_key_master = Zr.newRandomElement();
         this.Ppub = (this.P).duplicate().mulZn(this.private_key_master);
          //On reconstruit les clés privé es utilisateurs
-        Key_couples.clean();
+        Key_couples.clear();
         build_HashMap();
     }
 
     protected Element generate_private_key_ID(String ID){
-        if (map.get(ID) == null) {
+        if (Key_couples.get(ID) == null) {
             byte[] IDbytes = ID.getBytes();
             //On applique la fonction de hachage H1 à l'ID
             Element Qid = pairing.getG1().newElementFromHash(IDbytes, 0, IDbytes.length);
             //On calcule la clé privé de l'utilisateur ID
             Element private_key_ID = Qid.duplicate().mulZn(this.private_key_master);
             //On l'ajoute dans le Hashmap
-            this.Key_couples.put(ID, private_key_ID)
+            this.Key_couples.put(ID, private_key_ID);
             return private_key_ID;
         }
         else {return Key_couples.get(ID);}
@@ -52,35 +56,35 @@ public class IBEscheme {
     }
     protected byte[] XOR(byte[] a, byte[] b){
         byte[] c = new byte[a.length];
-        for(int i=0; i<a.length; i++){c[i]= a[i]^[i];}
+        for(int i=0; i<a.length; i++){c[i ]= (byte) ((int)a[i]^(int)b[i]);}
             return c;
     }
-    protected Object[2] Encryption_Basic_IBE(Element P, Element Ppub, String ID, String message){
-        Object[] C = new Object[2]
+    protected CypherText Encryption_Basic_IBE(Element P, Element Ppub, String ID, String message){
+        CypherText C = new CypherText();
         Element r = pairing.getZr().newRandomElement();
-        C[0]= P.duplicate().mulZn(r);
+        C.setU(P.duplicate().mulZn(r));
         byte[] IDbytes = ID.getBytes();
         //On applique la fonction de hachage H1 à l'ID
         Element Qid = pairing.getG1().newElementFromHash(IDbytes, 0, IDbytes.length);
         //On applique le couplage sur Ppub et Qid puis le hachage par H2
-        C[1] = pairing.pairing(Qid, Ppub).powZn(r).toBytes();
+        C.setV(pairing.pairing(Qid, Ppub).powZn(r).toBytes());
         //On effectue un XOR avec le message en clair
-        C[1] =XOR(message.getBytes(), C[1]);
+        C.setV(XOR(message.getBytes(), C.getV()));
         return C;
     }
 
-    protected byte[] Decryption_Basic_IBE(Element P, Element Ppub, Element private_key_ID, Object[] C){
-        Element M2 = pairing.pairing(private_key_ID, C[0]).toBytes();
-        byte[] M = XOR(C[1], M2);
+    protected byte[] Decryption_Basic_IBE(Element P, Element Ppub, Element private_key_ID, CypherText C){
+        byte[] M2 = pairing.pairing(private_key_ID, C.getU()).toBytes();
+        byte[] M = XOR(C.getV(), M2);
         return M;
     }
 
 
     public static void main(String[] args) {
         IBEscheme schema = new IBEscheme();
-        Oject[] cypher = schema.Encryption_Basic_IBE(schema.P, schema.Ppub, "antoine.auger27@gmail.com", "Bonjour Antoine, comment vas-tu ?");
-        byte[] plaintext = schema.Decryption_Basic_IBE(schema.P, schema.P, generate_private_key_ID("antoine.auger27@gmail.com"), cypher);
-        System.out.println(StandardCharsets.UTF_8.name((plaintext));
+        CypherText cypher = schema.Encryption_Basic_IBE(schema.P, schema.Ppub, "antoine.auger27@gmail.com", "Bonjour Antoine, comment vas-tu ?");
+        byte[] plaintext = schema.Decryption_Basic_IBE(schema.P, schema.P, schema.generate_private_key_ID("antoine.auger27@gmail.com"), cypher);
+        System.out.println(plaintext);
     }
 
 
