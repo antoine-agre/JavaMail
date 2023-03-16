@@ -18,6 +18,7 @@ public class MailHandler {
     protected Store store;
     private String user;
     private String password;
+    protected Message[] inbox;
 
     public MailHandler(String smtpServer, String imapServer, String user, String password) {
         Properties properties = new Properties();
@@ -73,45 +74,45 @@ public class MailHandler {
 
             Folder folderInbox = this.store.getFolder("INBOX");
             folderInbox.open(Folder.READ_ONLY);
-            Message[] arrayMessages = folderInbox.getMessages();
+            this.inbox = folderInbox.getMessages();
 
-            for (int i = 0; i < arrayMessages.length; i++) {
-                Message message = arrayMessages[i];
-                Address[] fromAddress = message.getFrom();
-
-                String from = fromAddress[0].toString();
-                String subject = message.getSubject();
-                String sentDate = message.getSentDate().toString();
-                String contentType = message.getContentType();
-                String messageContent = "";
-                boolean messageSeen = message.getFlags().contains(Flags.Flag.SEEN);
-                String attachFiles = "";
-                if (contentType.contains("multipart")) {
-                    messageContent = "[multipart]";
-                }
-                else if (contentType.contains("text/plain") || contentType.contains("text/html")) {
-                    Object content = message.getContent();
-                    if (content != null) {
-                        messageContent = content.toString();
-                    }
-                }
-
-                //Print
-                System.out.println("# Message #" + (i+1));
-                System.out.println("## Seen : " + messageSeen);
-                System.out.println("## From : " + from);
-                System.out.println("## Subject : " + subject);
-                System.out.println("## Sent : " + sentDate);
-                System.out.println("## Content type : " + contentType);
-//                System.out.println("## Message : \n" + messageContent);
-                System.out.println("## Message : \n" + message.getContent().toString());
-
-            }
+//            for (int i = 0; i < this.inbox.length; i++) {
+//                Message message = this.inbox[i];
+//                Address[] fromAddress = message.getFrom();
+//
+//                String from = fromAddress[0].toString();
+//                String subject = message.getSubject();
+//                String sentDate = message.getSentDate().toString();
+//                String contentType = message.getContentType();
+//                String messageContent = "";
+//                boolean messageSeen = message.getFlags().contains(Flags.Flag.SEEN);
+//                String attachFiles = "";
+//                if (contentType.contains("multipart")) {
+//                    messageContent = "[multipart]";
+//                }
+//                else if (contentType.contains("text/plain") || contentType.contains("text/html")) {
+//                    Object content = message.getContent();
+//                    if (content != null) {
+//                        messageContent = content.toString();
+//                    }
+//                }
+//
+//                //Print
+//                System.out.println("# Message #" + (i+1));
+//                System.out.println("## Seen : " + messageSeen);
+//                System.out.println("## From : " + from);
+//                System.out.println("## Subject : " + subject);
+//                System.out.println("## Sent : " + sentDate);
+//                System.out.println("## Content type : " + contentType);
+////                System.out.println("## Message : \n" + messageContent);
+//                System.out.println("## Message : \n" + message.getContent().toString());
+//
+//            }
 
             //Disconnect
             folderInbox.close(false);
 
-        } catch (MessagingException | IOException e) {
+        } catch (MessagingException /*| IOException*/ e) {
             throw new RuntimeException(e);
         }
 
