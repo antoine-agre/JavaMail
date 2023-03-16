@@ -84,7 +84,7 @@ public class IBEscheme {
         IBEscheme schema = new IBEscheme();
         CypherText cypher = schema.Encryption_Basic_IBE(schema.P, schema.Ppub, "antoine.auger27@gmail.com", "Bonjour Antoine, comment vas-tu ?");
         byte[] plaintext = schema.Decryption_Basic_IBE(schema.P, schema.P, schema.generate_private_key_ID("antoine.auger27@gmail.com"), cypher);
-        System.out.println(plaintext);
+        System.out.println(new String(plaintext, StandardCharsets.US_ASCII));
     }
 
 
