@@ -36,19 +36,21 @@ public class AESFileEncryptor {
 
         System.out.print("Enter secret key: ");
         String secretKey = "issa";
+        File dir = new File("Encryption/encryptedFiles");
+        dir.mkdirs();
 
         System.out.print("Enter path of file to encrypt: ");
-        File inputFile = new File("xxxxxxx");
+        File inputFile = new File("/home/issa/Courses/AdvCrypto/JavaMail/src/Encryption/file3.txt");
 
         System.out.print("Enter path of encrypted file: ");
-        File encryptedFile = new File("xxxxxxxxxxxxxx");
+        File encryptedFile = new File(dir,"encrypted_" + inputFile.getName());
 
         System.out.print("Enter path of decrypted file: ");
         File decryptedFile = new File("/home/issa/Courses/AdvCrypto/JavaMail/src/Encryption/file3.txt");
 
         try {
             fileEncrypt(inputFile, encryptedFile, secretKey);
-            fileDecrypt(encryptedFile, decryptedFile, secretKey);
+           // fileDecrypt(encryptedFile, decryptedFile, secretKey);
 
             System.out.println("File encrypted and decrypted successfully.");
         } catch (IOException e) {

@@ -1,9 +1,19 @@
 package mail;
 
+import Encryption.AESFileEncryptor;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+import java.io.File;
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Properties;
@@ -19,6 +29,8 @@ public class MailHandler {
     private String user;
     private String password;
     protected Message[] inbox;
+
+    protected String encryptedFilesFolder;
 
     public MailHandler(String smtpServer, String imapServer, String user, String password) {
         Properties properties = new Properties();
@@ -37,6 +49,8 @@ public class MailHandler {
         this.user = user;
         this.password = password;
 
+        this.encryptedFilesFolder  = "Encryption/EncryptedFiles/";
+
         try {
             this.store = this.session.getStore("imap");
             this.store.connect(this.user, this.password);
@@ -45,7 +59,41 @@ public class MailHandler {
         }
 
     }
+    public Message encryptedMail(String recipient, String subject, String message, String attachementPath, String secretKey) throws MessagingException, IOException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        MimeMessage mimeMessage = new MimeMessage(this.session);
+        mimeMessage.setFrom(this.user);
+        mimeMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
+        mimeMessage.setSubject(subject);
 
+        Multipart myemailcontent=new MimeMultipart();
+        MimeBodyPart bodypart=new MimeBodyPart();
+        bodypart.setText(message);
+
+        MimeBodyPart attachementfile=new MimeBodyPart();
+        File Attachementfile=new File(attachementPath);
+        File dir = new File(this.encryptedFilesFolder);
+        File encryptedAttachementfile=new File(dir, "Encrypted" + Attachementfile.getName());
+        encryptedAttachementfile.createNewFile();
+        AESFileEncryptor.fileEncrypt(Attachementfile,encryptedAttachementfile,secretKey);
+        attachementfile.attachFile(encryptedAttachementfile);
+        myemailcontent.addBodyPart(bodypart);
+        myemailcontent.addBodyPart(attachementfile);
+        mimeMessage.setContent(myemailcontent);
+        Transport.send(mimeMessage,this.user,this.password);
+        return mimeMessage;
+
+        //Transport.send(mimeMessage,this.user,this.password);
+
+    }
+    public void sendMail(String recipient, String subject, String message, String attachementPath, String secretKey)
+    {
+        String AESsecretKey = "secret2255";
+
+        message = message + "\n AES secret key: " + AESsecretKey;
+
+
+
+    }
     public void testMail() {
         /**
          * Envoie un mail de test de l'utilisateur à lui-même, contenant la date et l'heure.
