@@ -1,7 +1,11 @@
+package CA;
+
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Field;
 import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
+
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.lang.Math;
 import java.security.MessageDigest;
@@ -10,94 +14,77 @@ import java.util.HashMap;
 
 public class IBEscheme {
     static protected Pairing pairing = PairingFactory.getPairing("//Users/auger/Desktop/ICY 4A/Crypto avancée/IMINE/Cours/jpbc-2.0.0/params/curves/a.properties");
-    static protected Field Zr;
-    static protected Field G;
-    static protected Field GT;
+    static protected Field Zr = pairing.getZr();
+    static protected Field G = pairing.getG1();
+    static protected Field GT= pairing.getGT();
     protected Element P;
     protected Element Ppub;
     protected Element private_key_master;
-    HashMap<String, Element>  Key_couples;
-    ArrayList<String> IDs;
+    protected HashMap<String, Element>  Key_couples= new HashMap();
+    protected ArrayList<String> IDs= new ArrayList();
 
     IBEscheme(){
-        this.G = pairing.getG1();
-        this.GT = pairing.getGT();
-        this.Zr = pairing.getZr();
         this.private_key_master = Zr.newRandomElement();
-        this.G = pairing.getG1();
         this.P = G.newRandomElement();
         this.Ppub = P.duplicate().mulZn(private_key_master);
-        this.Key_couples = new HashMap ();
-        this.IDs = new ArrayList();
     }
-    private void New_Set_Up_IBE(){
-        this.private_key_master = Zr.newRandomElement();
+    protected void New_Set_Up_IBE(){
         this.P = G.newRandomElement();
         this.private_key_master = Zr.newRandomElement();
         this.Ppub = (this.P).duplicate().mulZn(this.private_key_master);
+         //On reconstruit les clés privé es utilisateurs
+        Key_couples.clear();
+        build_HashMap();
     }
 
-    private Element generate_private_key_ID(String ID){
-        Element Qid = G.newRandomElement();
+    protected Element generate_private_key_ID(String ID){
+        if (Key_couples.get(ID) == null) {
+            byte[] IDbytes = ID.getBytes();
+            //On applique la fonction de hachage H1 à l'ID
+            Element Qid = pairing.getG1().newElementFromHash(IDbytes, 0, IDbytes.length);
+            //On calcule la clé privé de l'utilisateur ID
+            Element private_key_ID = Qid.duplicate().mulZn(this.private_key_master);
+            //On l'ajoute dans le Hashmap
+            this.Key_couples.put(ID, private_key_ID);
+            return private_key_ID;
+        }
+        else {return Key_couples.get(ID);}
+    }
+
+    protected void build_HashMap(){
+        for (String adresse: IDs){generate_private_key_ID(adresse);}
+    }
+    protected byte[] XOR(byte[] a, byte[] b){
+        byte[] c = new byte[a.length];
+        for(int i=0; i<a.length; i++){c[i ]= (byte) ((int)a[i]^(int)b[i]);}
+            return c;
+    }
+    protected CypherText Encryption_Basic_IBE(Element P, Element Ppub, String ID, String message){
+        CypherText C = new CypherText();
+        Element r = pairing.getZr().newRandomElement();
+        C.setU(P.duplicate().mulZn(r));
         byte[] IDbytes = ID.getBytes();
-        Qid.setFromHash(IDbytes, 0, IDbytes.length);
-        Element private_key_ID = (this.private_key_master).duplicate().mul(Qid);
-        return private_key_ID;
+        //On applique la fonction de hachage H1 à l'ID
+        Element Qid = pairing.getG1().newElementFromHash(IDbytes, 0, IDbytes.length);
+        //On applique le couplage sur Ppub et Qid puis le hachage par H2
+        C.setV(pairing.pairing(Qid, Ppub).powZn(r).toBytes());
+        //On effectue un XOR avec le message en clair
+        C.setV(XOR(message.getBytes(), C.getV()));
+        return C;
     }
 
-    private void build_HashMap(){
-        this.Key_couples = new HashMap ();
-        for (String adresse: IDs){
-            this.Key_couples.put(adresse, generate_private_key_ID(adresse));
-        }
+    protected byte[] Decryption_Basic_IBE(Element P, Element Ppub, Element private_key_ID, CypherText C){
+        byte[] M2 = pairing.pairing(private_key_ID, C.getU()).toBytes();
+        byte[] M = XOR(C.getV(), M2);
+        return M;
     }
 
-    private void ajoute_Couples(String ID){
-        this.Key_couples.put(ID, generate_private_key_ID(ID));
-    }
-
-    private void remove_Couples(String ID){}
-
-    private static double[] encAL_GAMAL(double M, double a, double p, double[] publickey){
-        double[] crypted = {Math.pow(publickey[0],a) % p, M*Math.pow(publickey[0],a) % p};
-        return crypted;
-    }
-
-    private static double inverse(double n, double p){
-        for (int i = 1; i<p; i++){
-            if((i * n )% p == 1){return i;}
-        }
-        return 0;
-    }
-
-    private static double decAL_GAMAL(double M, double b, double p, double[] crypted){
-        double w = Math.pow(crypted[0],b) % p;
-        double inv_w = inverse(w, 17);
-        return inv_w * crypted[1];
-    }
-
-    private static ArrayList<String> decoupage(String message){
-        ArrayList<String> liste = new ArrayList<String>();
-        for (char ch: message.toCharArray()) {
-            //liste.add();
-        }
-        return liste;
-    }
-
-    public String chiffrement(String message){
-        //String code=decoupage(message);
-        //cyphertext=encAL_GAMAL();
-        return message;
-    }
 
     public static void main(String[] args) {
-        Pairing pairing = PairingFactory.getPairing("//Users/auger/Desktop/ICY 4A/Crypto avancée/IMINE/Cours/jpbc-2.0.0/params/curves/a.properties");
-        Field Zr = pairing.getZr();
-        Element privatekey = Zr.newRandomElement();
-        Field G = pairing.getG1();
-        Element generateur = Zr.newRandomElement();
-      /*  Element[] publickey = PKAL_GAMAL(generateur, privatekey);
-        Arraylist<String>cyphertext =chiffrement("Message à chiffrer avec l'algorithme d'AL-GAMAL.", public_key);*/
+        IBEscheme schema = new IBEscheme();
+        CypherText cypher = schema.Encryption_Basic_IBE(schema.P, schema.Ppub, "antoine.auger27@gmail.com", "Bonjour Antoine, comment vas-tu ?");
+        byte[] plaintext = schema.Decryption_Basic_IBE(schema.P, schema.P, schema.generate_private_key_ID("antoine.auger27@gmail.com"), cypher);
+        System.out.println(new String(plaintext, StandardCharsets.US_ASCII));
     }
 
 
