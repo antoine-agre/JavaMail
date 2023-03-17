@@ -1,6 +1,7 @@
 package mail;
 
-import Encryption.AESFileEncryptor;
+import Cryptography.IBEscheme;
+import Cryptography.AES.AESFileEncryptor;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -49,7 +50,7 @@ public class MailHandler {
         this.user = user;
         this.password = password;
 
-        this.encryptedFilesFolder  = "Encryption/EncryptedFiles/";
+        this.encryptedFilesFolder  = "Cryptography/EncryptedFiles/";
 
         try {
             this.store = this.session.getStore("imap");
@@ -59,7 +60,7 @@ public class MailHandler {
         }
 
     }
-    public Message encryptedMail(String recipient, String subject, String message, String attachementPath, String secretKey) throws MessagingException, IOException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+    public Message encryptMail(String recipient, String subject, String message, String attachementPath, String secretKey) throws MessagingException, IOException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         MimeMessage mimeMessage = new MimeMessage(this.session);
         mimeMessage.setFrom(this.user);
         mimeMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
@@ -69,27 +70,31 @@ public class MailHandler {
         MimeBodyPart bodypart=new MimeBodyPart();
         bodypart.setText(message);
 
+        // Encrypt attachment using AES
         MimeBodyPart attachementfile=new MimeBodyPart();
         File Attachementfile=new File(attachementPath);
         File dir = new File(this.encryptedFilesFolder);
-        File encryptedAttachementfile=new File(dir, "Encrypted" + Attachementfile.getName());
+        File encryptedAttachementfile=new File(dir, "Encrypted_" + Attachementfile.getName());
         encryptedAttachementfile.createNewFile();
         AESFileEncryptor.fileEncrypt(Attachementfile,encryptedAttachementfile,secretKey);
         attachementfile.attachFile(encryptedAttachementfile);
+
         myemailcontent.addBodyPart(bodypart);
         myemailcontent.addBodyPart(attachementfile);
         mimeMessage.setContent(myemailcontent);
         Transport.send(mimeMessage,this.user,this.password);
+
         return mimeMessage;
 
         //Transport.send(mimeMessage,this.user,this.password);
 
     }
-    public void sendMail(String recipient, String subject, String message, String attachementPath, String secretKey)
-    {
+    public void sendMail(String recipient, String subject, String message, String attachementPath) throws MessagingException, NoSuchPaddingException, IllegalBlockSizeException, IOException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         String AESsecretKey = "secret2255";
+        Message mimeMessage = encryptMail(recipient, subject, message, attachementPath, AESsecretKey);
+        IBEscheme schema = new IBEscheme();
+        message = message + "\nAES_SECRET_KEY: " + AESsecretKey;
 
-        message = message + "\n AES secret key: " + AESsecretKey;
 
 
 

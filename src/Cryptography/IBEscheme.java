@@ -1,19 +1,17 @@
-package CA;
+package Cryptography;
 
+import CA.CypherText;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Field;
 import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
 
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.lang.Math;
-import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class IBEscheme {
-    static protected Pairing pairing = PairingFactory.getPairing("//Users/auger/Desktop/ICY 4A/Crypto avancée/IMINE/Cours/jpbc-2.0.0/params/curves/a.properties");
+    static protected Pairing pairing = PairingFactory.getPairing("params/curves/a.properties");
     static protected Field Zr = pairing.getZr();
     static protected Field G = pairing.getG1();
     static protected Field GT= pairing.getGT();
@@ -23,7 +21,7 @@ public class IBEscheme {
     protected HashMap<String, Element>  Key_couples= new HashMap();
     protected ArrayList<String> IDs= new ArrayList();
 
-    IBEscheme(){
+    public IBEscheme(){
         this.private_key_master = Zr.newRandomElement();
         this.P = G.newRandomElement();
         this.Ppub = P.duplicate().mulZn(private_key_master);

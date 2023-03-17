@@ -1,5 +1,7 @@
-package Encryption;
+package Cryptography.AES;
 
+
+import Cryptography.AES.AES;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -7,7 +9,6 @@ import javax.crypto.NoSuchPaddingException;
 import java.io.*;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Scanner;
 
 public class AESFileEncryptor {
     public static void fileEncrypt(File inputFile, File outputFile, String secretKey) throws IOException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
@@ -36,7 +37,7 @@ public class AESFileEncryptor {
 
         System.out.print("Enter secret key: ");
         String secretKey = "issa";
-        File dir = new File("Encryption/encryptedFiles");
+        File dir = new File("Cryptography/encryptedFiles");
         dir.mkdirs();
 
         System.out.print("Enter path of file to encrypt: ");
