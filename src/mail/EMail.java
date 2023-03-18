@@ -15,6 +15,7 @@ public class EMail{
     protected String subject;
     protected String content;
     protected Boolean hasAttachment;
+    protected String fileName = "";
     protected Date date;
 
     public EMail(String fromAddress, String subject, String content, Boolean hasAttachment) {
@@ -96,6 +97,10 @@ public class EMail{
             else if (bodyPart.isMimeType("text/html")) {
                 result = "[HTML Content]";
             }
+            else if (Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition())) {
+                this.hasAttachment = true;
+                this.fileName = bodyPart.getFileName();
+            }
             else if (bodyPart.getContent() instanceof MimeMultipart) {
                 result = parseTextFromMimeMultipart((MimeMultipart) bodyPart.getContent());
             }
@@ -123,5 +128,9 @@ public class EMail{
 
     public Date getDate() {
         return date;
+    }
+
+    public String getFileName() {
+        return fileName;
     }
 }

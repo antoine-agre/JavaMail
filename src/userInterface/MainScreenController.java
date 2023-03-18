@@ -34,6 +34,7 @@ public class MainScreenController {
     @FXML protected Text focusTo;
     @FXML protected Label focusDate;
     @FXML protected Label focusContent;
+    @FXML protected Label attachmentName;
 
     @FXML
     public void initialize() {
@@ -69,6 +70,7 @@ public class MainScreenController {
         this.focusTo.setText(client.mailHandler.getUser());
         this.focusDate.setText(eMail.getDate().toString());
         this.focusContent.setText(eMail.getContent());
+        this.attachmentName.setText(eMail.getFileName());
     }
 
     public void addTestLine() {

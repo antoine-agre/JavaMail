@@ -117,7 +117,7 @@
                               <Separator orientation="VERTICAL" prefHeight="200.0" />
                               <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                                  <children>
-                                    <Label text="Right Pane" />
+                                    <Label fx:id="attachmentName" text="Pas de pièce-jointe" />
                                  </children>
                               </VBox>
                            </children>
