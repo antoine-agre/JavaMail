@@ -7,16 +7,21 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import mail.EMail;
 
+import java.io.File;
 import java.util.Date;
 
 public class SendScreenController {
 
     protected static Client client;
+    protected File choosenFile = null;
     @FXML protected TextField recipientField;
     @FXML protected TextField subjectField;
     @FXML protected TextArea textBodyField;
+    @FXML protected Button chooseFileButton;
+    @FXML protected Label choosenFileLabel;
 
     @FXML
     public void initialize() {
@@ -27,11 +32,26 @@ public class SendScreenController {
     }
 
     @FXML protected void handleSendAction(ActionEvent event) {
-        client.mailHandler.sendMail(
-                recipientField.getText(),
-                subjectField.getText(),
-                textBodyField.getText());
+        if (choosenFile == null) {
+            client.mailHandler.sendMail(
+                    recipientField.getText(),
+                    subjectField.getText(),
+                    textBodyField.getText());
+        } else {
+            client.mailHandler.sendMail(
+                    recipientField.getText(),
+                    subjectField.getText(),
+                    textBodyField.getText(),
+                    choosenFile);
+        }
+
         client.sendScreen.getStage().close();
+    }
+
+    @FXML protected void handleFileChoice() {
+        FileChooser fileChooser = new FileChooser();
+        choosenFile = fileChooser.showOpenDialog(client.sendScreen.getStage());
+        choosenFileLabel.setText(choosenFile.getName());
     }
 
 }

@@ -3,9 +3,15 @@ package mail;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Properties;
@@ -86,6 +92,37 @@ public class MailHandler {
         }
     }
 
+    public void sendMail(String recipientAddress, String subject, String textContent, File attachment) {
+
+        try {
+            //Header
+            MimeMessage message = new MimeMessage(this.session);
+            message.setFrom(this.user);
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipientAddress));
+            message.setSubject(subject);
+
+            //Corps et pièce jointe
+            BodyPart messageBodyPart = new MimeBodyPart();
+            messageBodyPart.setText(textContent);
+
+            Multipart multipart = new MimeMultipart();
+            multipart.addBodyPart(messageBodyPart);
+
+            messageBodyPart = new MimeBodyPart();
+            DataSource source = new FileDataSource(attachment);
+            messageBodyPart.setDataHandler(new DataHandler(source));
+            messageBodyPart.setFileName(attachment.getName());
+            multipart.addBodyPart(messageBodyPart);
+
+            message.setContent(multipart);
+
+            //Envoi
+            Transport.send(message, this.user, this.password);
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * Récupère les mails du dossier inbox
      */
@@ -101,8 +138,7 @@ public class MailHandler {
             Message[] inbox = folderInbox.getMessages();
             this.eMailList.clear();
 
-            for (int i = 0; i < 3; i++) {
-                Message message = inbox[i];
+            for (Message message : inbox) {
                 EMail email = new EMail(message);
                 this.eMailList.add(email);
             }
