@@ -14,7 +14,7 @@
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="userInterface.SendScreenController">
    <center>
-      <TextArea fx:id="textBodyField" prefHeight="200.0" prefWidth="200.0" promptText="Contenu du mail" BorderPane.alignment="CENTER">
+      <TextArea fx:id="textBodyField" prefHeight="200.0" prefWidth="200.0" promptText="Contenu du mail" wrapText="true" BorderPane.alignment="CENTER">
          <font>
             <Font name="Segoe UI" size="14.0" />
          </font>

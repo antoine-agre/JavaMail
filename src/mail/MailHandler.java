@@ -2,15 +2,12 @@ package mail;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.SortedList;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Properties;
 
 public class MailHandler {
@@ -20,7 +17,7 @@ public class MailHandler {
      */
 
     protected Session session;
-    protected Store store;
+//    protected Store store;
     protected String user;
     protected String password;
 //    protected ArrayList<EMail> eMailList = new ArrayList<EMail>();
@@ -43,20 +40,20 @@ public class MailHandler {
         this.user = user;
         this.password = password;
 
-        try {
-            this.store = this.session.getStore("imap");
-            this.store.connect(this.user, this.password);
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
-        }
-        checkMails();
+//        try {
+//            this.store = this.session.getStore("imap");
+//            this.store.connect(this.user, this.password);
+//        } catch (MessagingException e) {
+//            throw new RuntimeException(e);
+//        }
 
     }
 
+    /**
+     * Envoie un mail de test de l'utilisateur à lui-même, contenant la date et l'heure.
+     */
     public void testMail() {
-        /**
-         * Envoie un mail de test de l'utilisateur à lui-même, contenant la date et l'heure.
-         */
+
 
         try {
             MimeMessage message = new MimeMessage(this.session);
@@ -72,10 +69,10 @@ public class MailHandler {
         }
     }
 
+    /**
+     * Envoie un mail de test de l'utilisateur à lui-même, contenant la date et l'heure.
+     */
     public void sendMail(String recipientAddress, String subject, String textContent) {
-        /**
-         * Envoie un mail de test de l'utilisateur à lui-même, contenant la date et l'heure.
-         */
 
         try {
             MimeMessage message = new MimeMessage(this.session);
@@ -89,19 +86,22 @@ public class MailHandler {
         }
     }
 
+    /**
+     * Récupère les mails du dossier inbox
+     */
     public void checkMails() {
-        /**
-         * Récupère les mails du dossier inbox
-         */
 
         try {
 
-            Folder folderInbox = this.store.getFolder("INBOX");
+            Store store = this.session.getStore("imap");
+            store.connect(this.user, this.password);
+
+            Folder folderInbox = store.getFolder("INBOX");
             folderInbox.open(Folder.READ_ONLY);
             Message[] inbox = folderInbox.getMessages();
             this.eMailList.clear();
 
-            for (int i = 0; i < inbox.length; i++) {
+            for (int i = 0; i < 3; i++) {
                 Message message = inbox[i];
                 EMail email = new EMail(message);
                 this.eMailList.add(email);
@@ -109,6 +109,7 @@ public class MailHandler {
 
             //Disconnect
             folderInbox.close(false);
+            store.close();
 
         } catch (MessagingException e) {
             throw new RuntimeException(e);

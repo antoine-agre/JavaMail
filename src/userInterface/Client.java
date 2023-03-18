@@ -50,7 +50,7 @@ public class Client extends Application {
     }
 
     public void connectClient(String smtp, String imap, String login, String password) {
-        mailHandler = new MailHandler(smtp, imap, login, password);
+        this.mailHandler = new MailHandler(smtp, imap, login, password);
         switchToMain();
     }
 

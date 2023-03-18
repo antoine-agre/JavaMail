@@ -57,11 +57,16 @@ public class MainScreenController {
     }
 
     public void refreshMails() {
+        client.mailHandler.checkMails();
         tableView.setItems(FXCollections.observableArrayList());
         ObservableList<EMail> mailList = client.mailHandler.getEMailList();
         for (EMail eMail : mailList) {
             tableView.getItems().add(eMail);
         }
+    }
+
+    public void emptyList() {
+        tableView.setItems(FXCollections.observableArrayList());
     }
 
     public void showMail(EMail eMail) {
