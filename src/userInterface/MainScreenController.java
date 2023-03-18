@@ -73,6 +73,10 @@ public class MainScreenController {
         this.attachmentName.setText(eMail.getFileName());
     }
 
+    public void composeMail() {
+        client.composeMail();
+    }
+
     public void addTestLine() {
 
 //        try {

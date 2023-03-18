@@ -19,6 +19,7 @@ public class Client extends Application {
 
     LoginScreen loginScreen;
     MainScreen mainScreen;
+    SendScreen sendScreen;
     Stage stage;
     MailHandler mailHandler;
 
@@ -38,6 +39,7 @@ public class Client extends Application {
         LoginScreenController.client = this;
         MainScreen.client = this;
         MainScreenController.client = this;
+        SendScreenController.client = this;
 
         //////
 
@@ -56,6 +58,12 @@ public class Client extends Application {
         this.stage.setScene(this.mainScreen.getScene());
 //        this.stage.sizeToScene();
         this.stage.centerOnScreen();
+    }
+
+    public void composeMail() {
+        sendScreen = new SendScreen();
+        Stage composeWindow = new Stage();
+        sendScreen.start(composeWindow);
     }
 
 }

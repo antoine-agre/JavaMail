@@ -72,6 +72,23 @@ public class MailHandler {
         }
     }
 
+    public void sendMail(String recipientAddress, String subject, String textContent) {
+        /**
+         * Envoie un mail de test de l'utilisateur à lui-même, contenant la date et l'heure.
+         */
+
+        try {
+            MimeMessage message = new MimeMessage(this.session);
+            message.setFrom(this.user);
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipientAddress));
+            message.setText(textContent);
+            message.setSubject(subject);
+            Transport.send(message, this.user, this.password);
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void checkMails() {
         /**
          * Récupère les mails du dossier inbox
