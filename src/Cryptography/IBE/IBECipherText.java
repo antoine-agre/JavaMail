@@ -1,10 +1,10 @@
-package CA;
+package Cryptography.IBE;
 import it.unisa.dia.gas.jpbc.Element;
-public class CypherText {
+public class IBECipherText {
     protected Element U;
     protected byte[] V;
 
-    public CypherText() {
+    public IBECipherText() {
     }
 
     public Element getU() {

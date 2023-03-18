@@ -1,6 +1,5 @@
-package Cryptography;
+package Cryptography.IBE;
 
-import CA.CypherText;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Field;
 import it.unisa.dia.gas.jpbc.Pairing;
@@ -57,8 +56,8 @@ public class IBEscheme {
         for(int i=0; i<a.length; i++){c[i ]= (byte) ((int)a[i]^(int)b[i]);}
             return c;
     }
-    protected CypherText Encryption_Basic_IBE(Element P, Element Ppub, String ID, String message){
-        CypherText C = new CypherText();
+    protected IBECipherText Encryption_Basic_IBE(Element P, Element Ppub, String ID, String message){
+        IBECipherText C = new IBECipherText();
         Element r = pairing.getZr().newRandomElement();
         C.setU(P.duplicate().mulZn(r));
         byte[] IDbytes = ID.getBytes();
@@ -71,7 +70,7 @@ public class IBEscheme {
         return C;
     }
 
-    protected byte[] Decryption_Basic_IBE(Element P, Element Ppub, Element private_key_ID, CypherText C){
+    protected byte[] Decryption_Basic_IBE(Element P, Element Ppub, Element private_key_ID, IBECipherText C){
         byte[] M2 = pairing.pairing(private_key_ID, C.getU()).toBytes();
         byte[] M = XOR(C.getV(), M2);
         return M;
@@ -80,7 +79,7 @@ public class IBEscheme {
 
     public static void main(String[] args) {
         IBEscheme schema = new IBEscheme();
-        CypherText cypher = schema.Encryption_Basic_IBE(schema.P, schema.Ppub, "antoine.auger27@gmail.com", "Bonjour Antoine, comment vas-tu ?");
+        IBECipherText cypher = schema.Encryption_Basic_IBE(schema.P, schema.Ppub, "antoine.auger27@gmail.com", "Bonjour Antoine, comment vas-tu ?");
         byte[] plaintext = schema.Decryption_Basic_IBE(schema.P, schema.P, schema.generate_private_key_ID("antoine.auger27@gmail.com"), cypher);
         System.out.println(new String(plaintext, StandardCharsets.US_ASCII));
     }

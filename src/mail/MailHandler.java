@@ -1,6 +1,6 @@
 package mail;
 
-import Cryptography.IBEscheme;
+import Cryptography.IBE.IBEscheme;
 import Cryptography.AES.AESFileEncryptor;
 
 import javax.crypto.BadPaddingException;
