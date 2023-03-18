@@ -32,12 +32,12 @@ public class MailTest {
                 loginProperties.getProperty("user"),
                 loginProperties.getProperty("password")
         );
-       /* try {
-            handler.sendMail("gmail.com", "Test de mail", "Test de mail","/home/issa/Courses/AdvCrypto/JavaMail/src/Encryption/file1.txt","issa");
+       try {
+            handler.sendMail("issa.mboup314@gmail.com", "Test de mail", "Test de mail","/home/issa/Courses/AdvCrypto/JavaMail/src/Cryptography/file1.txt");
         } catch (MessagingException | IOException | NoSuchPaddingException | IllegalBlockSizeException |
                  NoSuchAlgorithmException | BadPaddingException | InvalidKeyException e) {
             throw new RuntimeException(e);
-        }*/
+        }
        // handler.testMail();
       //  handler.checkMails();
         System.out.println("Fin des tests");
