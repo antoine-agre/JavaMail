@@ -15,7 +15,7 @@ import java.util.Date;
 
 public class SendScreenController {
 
-    protected static Client client;
+    protected Client client;
     protected File choosenFile = null;
     @FXML protected TextField recipientField;
     @FXML protected TextField subjectField;

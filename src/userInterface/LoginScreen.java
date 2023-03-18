@@ -12,13 +12,19 @@ import java.util.Objects;
 public class LoginScreen{
 
     protected Scene scene;
+    protected Client client;
 
-    public LoginScreen(){
+    public LoginScreen(Client client){
+
+        this.client = client;
 
         try {
-            Parent root = FXMLLoader.load(Objects.requireNonNull(
+            FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(
                     getClass().getResource("/resources/fxml/loginScreen.fxml"),
                     "FXML file not loaded correctly."));
+            Parent root = loader.load();
+            LoginScreenController controller = loader.getController();
+            controller.client = this.client;
 
             this.scene = new Scene(root, 600, 400);
         } catch (IOException e) {

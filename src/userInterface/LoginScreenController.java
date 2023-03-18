@@ -9,7 +9,7 @@ import mail.MailHandler;
 
 public class LoginScreenController {
 
-    protected static Client client;
+    protected Client client;
     @FXML private TextField smtpInput;
     @FXML private Text smtpInputError;
     @FXML private TextField imapInput;

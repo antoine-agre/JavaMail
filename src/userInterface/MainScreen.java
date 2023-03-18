@@ -14,12 +14,17 @@ public class MainScreen {
     protected Scene scene;
     protected static Client client;
 
-    public MainScreen(){
+    public MainScreen(Client client){
+
+        this.client = client;
 
         try {
-            Parent root = FXMLLoader.load(Objects.requireNonNull(
+            FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(
                     getClass().getResource("/resources/fxml/mainScreen.fxml"),
                     "FXML file not loaded correctly."));
+            Parent root = loader.load();
+            MainScreenController controller = loader.getController();
+            controller.client = this.client;
 
             this.scene = new Scene(root, 1366, 768);
         } catch (IOException e) {

@@ -28,18 +28,18 @@ public class Client extends Application {
     @Override
     public void start(Stage stage) {
 
-        this.loginScreen = new LoginScreen();
+        this.loginScreen = new LoginScreen(this);
         Scene loginScene = this.loginScreen.getScene();
 
-        this.mainScreen = new MainScreen();
+        this.mainScreen = new MainScreen(this);
         Scene mainScene = this.mainScreen.getScene();
 
         //////
 
-        LoginScreenController.client = this;
-        MainScreen.client = this;
-        MainScreenController.client = this;
-        SendScreenController.client = this;
+//        LoginScreenController.client = this;
+//        MainScreen.client = this;
+//        MainScreenController.client = this;
+//        SendScreenController.client = this;
 
         //////
 
@@ -61,7 +61,7 @@ public class Client extends Application {
     }
 
     public void composeMail() {
-        sendScreen = new SendScreen();
+        sendScreen = new SendScreen(this);
         Stage composeWindow = new Stage();
         sendScreen.start(composeWindow);
     }

@@ -22,7 +22,7 @@ import java.util.Date;
 
 public class MainScreenController {
 
-    protected static Client client;
+    protected Client client;
     @FXML protected TableView<EMail> tableView;
     @FXML protected TableColumn<EMail, Date> dateColumn;
     @FXML protected TableColumn<EMail, String> fromColumn;
