@@ -1,5 +1,6 @@
-package Encryption.ElGamal;
+package Cryptography.ElGamal;
 
+import Cryptography.CipherText;
 import it.unisa.dia.gas.jpbc.*;
 import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
 

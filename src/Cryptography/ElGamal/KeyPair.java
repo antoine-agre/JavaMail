@@ -1,4 +1,4 @@
-package Encryption.ElGamal;
+package Cryptography.ElGamal;
 
 import it.unisa.dia.gas.jpbc.Element;
 
