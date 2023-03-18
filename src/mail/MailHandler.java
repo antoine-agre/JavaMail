@@ -1,11 +1,16 @@
 package mail;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
+
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Properties;
 
 public class MailHandler {
@@ -16,9 +21,10 @@ public class MailHandler {
 
     protected Session session;
     protected Store store;
-    private String user;
-    private String password;
-    protected Message[] inbox;
+    protected String user;
+    protected String password;
+//    protected ArrayList<EMail> eMailList = new ArrayList<EMail>();
+    protected ObservableList<EMail> eMailList = FXCollections.observableArrayList();
 
     public MailHandler(String smtpServer, String imapServer, String user, String password) {
         Properties properties = new Properties();
@@ -43,6 +49,7 @@ public class MailHandler {
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
+        checkMails();
 
     }
 
@@ -74,48 +81,29 @@ public class MailHandler {
 
             Folder folderInbox = this.store.getFolder("INBOX");
             folderInbox.open(Folder.READ_ONLY);
-            this.inbox = folderInbox.getMessages();
+            Message[] inbox = folderInbox.getMessages();
+            this.eMailList.clear();
 
-//            for (int i = 0; i < this.inbox.length; i++) {
-//                Message message = this.inbox[i];
-//                Address[] fromAddress = message.getFrom();
-//
-//                String from = fromAddress[0].toString();
-//                String subject = message.getSubject();
-//                String sentDate = message.getSentDate().toString();
-//                String contentType = message.getContentType();
-//                String messageContent = "";
-//                boolean messageSeen = message.getFlags().contains(Flags.Flag.SEEN);
-//                String attachFiles = "";
-//                if (contentType.contains("multipart")) {
-//                    messageContent = "[multipart]";
-//                }
-//                else if (contentType.contains("text/plain") || contentType.contains("text/html")) {
-//                    Object content = message.getContent();
-//                    if (content != null) {
-//                        messageContent = content.toString();
-//                    }
-//                }
-//
-//                //Print
-//                System.out.println("# Message #" + (i+1));
-//                System.out.println("## Seen : " + messageSeen);
-//                System.out.println("## From : " + from);
-//                System.out.println("## Subject : " + subject);
-//                System.out.println("## Sent : " + sentDate);
-//                System.out.println("## Content type : " + contentType);
-////                System.out.println("## Message : \n" + messageContent);
-//                System.out.println("## Message : \n" + message.getContent().toString());
-//
-//            }
+            for (int i = 0; i < inbox.length; i++) {
+                Message message = inbox[i];
+                EMail email = new EMail(message);
+                this.eMailList.add(email);
+            }
 
             //Disconnect
             folderInbox.close(false);
 
-        } catch (MessagingException /*| IOException*/ e) {
+        } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
 
     }
 
+    public ObservableList<EMail> getEMailList() {
+        return eMailList;
+    }
+
+    public String getUser() {
+        return user;
+    }
 }

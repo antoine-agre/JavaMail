@@ -7,6 +7,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import mail.MailHandler;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -19,6 +20,7 @@ public class Client extends Application {
     LoginScreen loginScreen;
     MainScreen mainScreen;
     Stage stage;
+    MailHandler mailHandler;
 
     public static void main(String[] args) {launch(args);}
 
@@ -34,6 +36,8 @@ public class Client extends Application {
         //////
 
         LoginScreenController.client = this;
+        MainScreen.client = this;
+        MainScreenController.client = this;
 
         //////
 
@@ -43,8 +47,15 @@ public class Client extends Application {
         this.stage.show();
     }
 
+    public void connectClient(String smtp, String imap, String login, String password) {
+        mailHandler = new MailHandler(smtp, imap, login, password);
+        switchToMain();
+    }
+
     public void switchToMain() {
         this.stage.setScene(this.mainScreen.getScene());
+//        this.stage.sizeToScene();
+        this.stage.centerOnScreen();
     }
 
 }

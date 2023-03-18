@@ -58,7 +58,7 @@
       </Label>
       <VBox alignment="BOTTOM_CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
          <children>
-            <TextField promptText="smtp.gmail.com">
+            <TextField fx:id="smtpInput" promptText="smtp.gmail.com" text="smtp.gmail.com">
                <opaqueInsets>
                   <Insets />
                </opaqueInsets>
@@ -78,7 +78,7 @@
       </VBox>
       <VBox alignment="BOTTOM_CENTER" layoutX="290.0" layoutY="77.0" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
          <children>
-            <TextField promptText="imap.gmail.com">
+            <TextField fx:id="imapInput" promptText="imap.gmail.com" text="imap.gmail.com">
                <opaqueInsets>
                   <Insets />
                </opaqueInsets>
@@ -98,7 +98,7 @@
       </VBox>
       <VBox alignment="BOTTOM_CENTER" layoutX="290.0" layoutY="144.0" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
          <children>
-            <TextField promptText="appli.mail.crypto@gmail.com">
+            <TextField fx:id="emailAddressInput" promptText="appli.mail.crypto@gmail.com" text="appli.mail.crypto@gmail.com">
                <opaqueInsets>
                   <Insets />
                </opaqueInsets>
@@ -118,7 +118,7 @@
       </VBox>
       <VBox alignment="BOTTOM_CENTER" layoutX="290.0" layoutY="212.0" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
          <children>
-            <PasswordField />
+            <PasswordField fx:id="passwordInput" />
             <Text fx:id="passwordInputError" fill="RED" strokeType="OUTSIDE" strokeWidth="0.0">
                <font>
                   <Font name="Segoe UI" size="12.0" />
