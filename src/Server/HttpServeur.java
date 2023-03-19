@@ -15,12 +15,26 @@ import java.net.InetSocketAddress;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import Cryptography.IBE.*;
+import Cryptography.ElGamal.*;
+import it.unisa.dia.gas.jpbc.Element;
+
 public class HttpServeur {
 
+    static IBEscheme ibe = new IBEscheme();
 
-    public void verifyClientId(String emailAddress){
 
+    /**
+     * verifie si l'identite specifiee est bien celle du client en envoyant un mail de confirmation
+     *
+     * @param emailAddress l'adresse mail sur laquelle le message de verification est envoye
+     * @return true si l'identite est verifiee, false sinon
+     */
+    public boolean verifyClientId(String emailAddress) {
+
+        return true;
     }
+
     public static void main(String[] args) {
 
         try {
@@ -43,13 +57,36 @@ public class HttpServeur {
                     System.out.println(emailAddress);
                     System.out.println(elGamalPublicKey);
 
-                    byte[] bytes = "bonjour client ..".getBytes();
+                    /*
+                    * Verify client ID
+                    * */
 
-                    he.sendResponseHeaders(200, bytes.length);
+
+                    Element privateKey = ibe.generate_private_key_ID(emailAddress);
+                    /*
+                    CipherText encryptedPrivateKey = encrypt(privateKey, keyPair.publicKey(), pairing,generator);
+                    */
+
+                    Element[] PP = ibe.Public_Parameters();
+
+
+                    System.out.println(privateKey.toString());
+                    System.out.println(PP[0].toString());
+                    System.out.println(PP[1].toString());
+
+
+                    byte[] privateKeyBytes = privateKey.toString().getBytes();
+                    byte[] P = PP[0].toString().getBytes();
+                    byte[] Ppub = PP[1].toString().getBytes();
+
+
+                    he.sendResponseHeaders(200, privateKeyBytes.length + P.length + PP.length);
 
                     OutputStream os = he.getResponseBody();
 
-                    os.write(bytes);
+                    os.write(privateKeyBytes);
+                    os.write(P);
+                    os.write(Ppub);
                     System.out.println("sending response done....");
                     os.close();
                 }

@@ -34,14 +34,14 @@ public class IBEscheme {
         build_HashMap();
     }
 
-    protected Element[] Pubic_Parameters(){
+    public Element[] Public_Parameters(){
         Element[] PP = new Element[2];
         PP[0] = this.P;
         PP[1] = this.Ppub;
         return PP;
     }
 
-    protected Element generate_private_key_ID(String ID){
+    public Element generate_private_key_ID(String ID){
         if (Key_couples.get(ID) == null) {
             byte[] IDbytes = ID.getBytes();
             //On applique la fonction de hachage H1 à l'ID
