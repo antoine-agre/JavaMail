@@ -45,20 +45,19 @@ public class Client {
         elGamalKeyPair = ElGamal.generateKeyPair(pairing, generator);
     }
 
-    public static void main(String[] args) {
-
-
+    public void privateKeyRequest(){
         try {
-            URL url = new URL("http://127.0.1.1:8080/service");
-            // URL url = new URL("https://www.google.com");
+            URL SERVER_URL = new URL("http://127.0.1.1:8080/service");
 
-            URLConnection urlConn = url.openConnection();
+            URLConnection urlConn = SERVER_URL.openConnection();
             urlConn.setDoInput(true);
             urlConn.setDoOutput(true);
             OutputStream out = urlConn.getOutputStream();
-            //out.write(user_name.getBytes());
-            System.out.println("salut....");
-            out.write("salut...".getBytes());
+            out.write(emailAddress.getBytes());
+
+            generateElGamalKeyPair();
+            Element publicKey = elGamalKeyPair.publicKey();
+            out.write(publicKey.toString().getBytes());
 
             InputStream dis = urlConn.getInputStream();
             byte[] b = new byte[Integer.parseInt(urlConn.getHeaderField("Content-length"))];
@@ -72,5 +71,11 @@ public class Client {
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public static void main(String[] args) {
+        Client c = new Client("appli.mail.crypto@gmail.com");
+        c.privateKeyRequest();
+
     }
 }
