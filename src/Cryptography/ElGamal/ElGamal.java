@@ -9,14 +9,12 @@ public class ElGamal {
 
     public static void main(String[] args) {
 
-        PairingParameters pairingParams = PairingFactory.getPairingParameters("params/curves/a.properties");
+        PairingParameters pairingParams = PairingFactory.getPairingParameters("Cryptography/params/curves/a.properties");
         Pairing pairing = PairingFactory.getPairing(pairingParams);
         Element generator = pairing.getZr().newRandomElement();
 
         KeyPair keyPair = generateKeyPair(pairing,generator);
-        String str = "xxxxxxxxxxxxxxxx";
         Element message = pairing.getZr().newElement();
-        message.setFromBytes(str.getBytes());
 
 
 

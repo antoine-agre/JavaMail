@@ -15,6 +15,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -34,11 +35,12 @@ public class MailHandler {
     private String user;
     private String password;
     protected Message[] inbox;
-    //Cette initialisation sert de test
+    //Cette initialisation sert uniquer de test
     //TODO à changer
     protected IBEscheme pubParams =  new IBEscheme();
 
     protected File encryptedFilesFolder ;
+    protected File decryptedFilesFolder ;
 
     public MailHandler(String smtpServer, String imapServer, String user, String password) {
         Properties properties = new Properties();
@@ -58,6 +60,9 @@ public class MailHandler {
         this.password = password;
 
         this.encryptedFilesFolder  = new File("EncryptedFiles/");
+        this.encryptedFilesFolder.mkdirs();
+        this.decryptedFilesFolder = new File("DecryptedFiles/");
+        this.decryptedFilesFolder.mkdirs();
 
         try {
             this.store = this.session.getStore("imap");
@@ -68,9 +73,10 @@ public class MailHandler {
 
     }
 
-    public Message sendMail(String recipient, String subject, String message, String attachementPath) throws MessagingException, IOException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
 
-        String AESKey = "sbdhfdh";  //TODO créer une fonction permettant de générer des strings aléatoirement
+    public void sendMail(String recipient, String subject, String message, String attachementPath) throws MessagingException, IOException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+
+        String AESKey = AES.randomString();
 
         MimeMessage mimeMessage = new MimeMessage(this.session);
         mimeMessage.setFrom(this.user);
@@ -90,10 +96,11 @@ public class MailHandler {
             AESFileEncryptor.fileEncrypt(Attachementfile,encryptedAttachementfile,AESKey);
             attachementfile.attachFile(encryptedAttachementfile);
 
-            //Second Attachment : the file containing AES key infos and decrypted using recipient IBE ID
+            //Second Attachment : the file containing AES key infos encrypted using recipient IBE ID
             MimeBodyPart AESInfosFile=new MimeBodyPart();
             File AESinfos = AESdecryptionInfos(Attachementfile.getName(),AESKey);
             AESInfosFile.attachFile(AESinfos);
+
             myemailcontent.addBodyPart(attachementfile);
             myemailcontent.addBodyPart(AESInfosFile);
         }
@@ -102,8 +109,6 @@ public class MailHandler {
         mimeMessage.setContent(myemailcontent);
         Transport.send(mimeMessage,this.user,this.password);
 
-        return mimeMessage;
-
     }
 
     //Create file that contains information about AES key
@@ -111,18 +116,45 @@ public class MailHandler {
         IBECipherText cipher = this.pubParams.Encryption_Basic_IBE(this.pubParams.getP(), this.pubParams.getPpub(), this.user,AESKey);
         Element u = cipher.getU();
         byte[] v = cipher.getV();
-        File AESInfos=new File(this.encryptedFilesFolder, "AES_" + name);
+        File AESInfos=new File(this.encryptedFilesFolder, "AES_" + name.replaceFirst("[.][^.]+$",".properties"));
         AESInfos.createNewFile();
-        FileOutputStream outputStream = new FileOutputStream(AESInfos);
-            byte[] inputBytesU = u.toBytes();
 
-            outputStream.write("u:".getBytes());
-            outputStream.write(inputBytesU);
-            outputStream.write("\nv:".getBytes());
-            outputStream.write(v);
+        FileOutputStream outputStream = new FileOutputStream(AESInfos);
+        byte[] inputBytesU = u.toBytes();
+        outputStream.write("u:".getBytes());
+        outputStream.write(inputBytesU);
+        outputStream.write("\nv:".getBytes());
+        outputStream.write(v);
 
         return AESInfos;
     }
+
+
+    public File decryptAttachment(String attachmentPath,String AESInfoPath, Element privateKey) throws NoSuchPaddingException, IllegalBlockSizeException, IOException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        //Retrieve AES key infos
+        Properties AESproperties = new Properties();
+        try {
+            AESproperties.load(new FileInputStream(AESInfoPath));
+        } catch(IOException e) {e.printStackTrace();}
+        byte[] u_bytes = AESproperties.getProperty("u").getBytes();
+        Element u = this.pubParams.getG().newElementFromBytes(u_bytes);
+        byte [] v = AESproperties.getProperty("v").getBytes();
+
+        // Decrypt AES key using IBE private key
+        IBECipherText C = new IBECipherText(u,v);
+        byte [] AESprivateKeyBytes = this.pubParams.Decryption_Basic_IBE(this.pubParams.getP(),this.pubParams.getP(),privateKey,C);
+        String AESprivateKey = new String(AESprivateKeyBytes);
+
+        //Decrypt the file using AES key
+        File attachmentFile = new File(attachmentPath);
+        File decryptedAttachmentFile = new File(decryptedFilesFolder,"decrypted_"+attachmentFile.getName());
+        AESFileEncryptor.fileDecrypt(attachmentFile, decryptedAttachmentFile,AESprivateKey);
+
+        return decryptedAttachmentFile;
+    }
+
+
+
 
 
     public void testMail(){

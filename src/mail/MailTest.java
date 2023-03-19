@@ -25,7 +25,7 @@ public class MailTest {
         System.out.println("user prop : " + loginProperties.getProperty("user"));
         System.out.println("pswd prop : " + loginProperties.getProperty("password"));
 
-        System.out.println("Début des tests");
+        System.out.println("Envoi en cours ...");
         MailHandler handler = new MailHandler(
                 "smtp.gmail.com",
                 "imap.gmail.com",
@@ -33,13 +33,12 @@ public class MailTest {
                 loginProperties.getProperty("password")
         );
        try {
-            handler.sendMail("issa.mboup314@gmail.com", "Test de mail", "Test de mail","/home/issa/Courses/AdvCrypto/JavaMail/src/Cryptography/file1.txt");
+            handler.sendMail("issa.mboup314@gmail.com", "Test de mail", "Test de mail","/home/issa/Courses/Networking/Exercices - 03 - OSPF - élèves -.pdf");
         } catch (MessagingException | IOException | NoSuchPaddingException | IllegalBlockSizeException |
                  NoSuchAlgorithmException | BadPaddingException | InvalidKeyException e) {
             throw new RuntimeException(e);
         }
-       // handler.testMail();
-      //  handler.checkMails();
-        System.out.println("Fin des tests");
+
+        System.out.println("Mail envoyé");
     }
 }

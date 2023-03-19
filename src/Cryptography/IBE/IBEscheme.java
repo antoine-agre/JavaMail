@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class IBEscheme {
-    static protected Pairing pairing = PairingFactory.getPairing("/home/issa/Courses/AdvCrypto/JavaMail/src/params/curves/a.properties");
+    static protected Pairing pairing = PairingFactory.getPairing("/home/issa/Courses/AdvCrypto/JavaMail/src/Cryptography/params/curves/a.properties");
     static protected Field Zr = pairing.getZr();
     static protected Field G = pairing.getG1();
     static protected Field GT= pairing.getGT();
@@ -114,7 +114,7 @@ public class IBEscheme {
         return C;
     }
 
-    protected byte[] Decryption_Basic_IBE(Element P, Element Ppub, Element private_key_ID, IBECipherText C){
+    public byte[] Decryption_Basic_IBE(Element P, Element Ppub, Element private_key_ID, IBECipherText C){
         byte[] M2 = pairing.pairing(private_key_ID, C.getU()).toBytes();
         byte[] M = XOR(C.getV(), M2);
         return M;
