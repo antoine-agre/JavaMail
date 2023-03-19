@@ -18,18 +18,19 @@ import java.util.logging.Logger;
 public class HttpServeur {
 
 
+    public void verifyClientId(String emailAddress){
+
+    }
     public static void main(String[] args) {
 
         try {
-            // InetSocketAddress s = new InetSocketAddress("localhost", 8080);
             System.out.println("my address:" + InetAddress.getLocalHost());
             InetSocketAddress s = new InetSocketAddress(InetAddress.getLocalHost(), 8080);
-            //  InetSocketAddress s = new InetSocketAddress("localhost", 8080);
 
 
             HttpServer server = HttpServer.create(s, 1000);
             System.out.println(server.getAddress());
-            server.createContext("/service", new HttpHandler() {
+            server.createContext("/privateKeyRequest", new HttpHandler() {
                 public void handle(HttpExchange he) throws IOException {
                     byte[] bytes1 = new byte[Integer.parseInt(he.getRequestHeaders().getFirst("Content-length"))];
                     he.getRequestBody().read(bytes1);
@@ -39,8 +40,8 @@ public class HttpServeur {
                     String emailAddress = clientDataTable[0];
                     String elGamalPublicKey = clientDataTable[1];
 
-                    System.out.println("message reçu " + emailAddress);
-                    System.out.println("message reçu " + elGamalPublicKey);
+                    System.out.println(emailAddress);
+                    System.out.println(elGamalPublicKey);
 
                     byte[] bytes = "bonjour client ..".getBytes();
 
