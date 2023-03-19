@@ -31,6 +31,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.util.Properties;
 
 public class MailHandler {
@@ -101,13 +102,15 @@ public class MailHandler {
         byte[] v = cipher.getV();
         File AESInfos=new File(this.encryptedFilesFolder, "AES_" + name.replaceFirst("[.][^.]+$",".properties"));
         AESInfos.createNewFile();
-
-        FileOutputStream outputStream = new FileOutputStream(AESInfos);
+        Properties props = new Properties();
+        props.load(new FileInputStream(AESInfos));
         byte[] inputBytesU = u.toBytes();
-        outputStream.write("u:".getBytes());
-        outputStream.write(inputBytesU);
-        outputStream.write("\nv:".getBytes());
-        outputStream.write(v);
+        String encodedU =  Base64.getEncoder().encodeToString(inputBytesU);
+        String encodeV = Base64.getEncoder().encodeToString(v);
+        props.put("u",encodedU);
+        props.put("v",encodeV);
+        FileOutputStream outputStream = new FileOutputStream(AESInfos);
+        props.store(outputStream,"AES secret key");
 
         return AESInfos;
     }
@@ -119,9 +122,12 @@ public class MailHandler {
         try {
             AESproperties.load(new FileInputStream(AESInfoFile));
         } catch(IOException e) {e.printStackTrace();}
-        byte[] u_bytes = AESproperties.getProperty("u").getBytes();
-        Element u = this.pubParams.getG().newElementFromBytes(u_bytes);
-        byte [] v = AESproperties.getProperty("v").getBytes();
+        String encodedU = AESproperties.getProperty("u");
+        String encodedV = AESproperties.getProperty("v");
+        byte [] uBytes = Base64.getDecoder().decode(encodedU);
+        byte [] v = Base64.getDecoder().decode(encodedV);
+        Element u = this.pubParams.getG().newElement();
+        u.setFromBytes(uBytes);
 
         // Decrypt AES key using IBE private key
         IBECipherText C = new IBECipherText(u,v);
