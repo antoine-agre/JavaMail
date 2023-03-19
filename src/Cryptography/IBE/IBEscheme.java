@@ -6,11 +6,12 @@ import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
 
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class IBEscheme {
-    static protected Pairing pairing = PairingFactory.getPairing("/home/issa/Courses/AdvCrypto/JavaMail/src/Cryptography/params/curves/a.properties");
+    static protected Pairing pairing = PairingFactory.getPairing(Path.of("src/Cryptography/param/a.properties").toString());
     static protected Field Zr = pairing.getZr();
     static protected Field G = pairing.getG1();
     static protected Field GT= pairing.getGT();

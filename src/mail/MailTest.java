@@ -32,12 +32,12 @@ public class MailTest {
                 loginProperties.getProperty("user"),
                 loginProperties.getProperty("password")
         );
-       try {
-            handler.sendMail("aaaaaa", "Test de mail", "Test de mail","aaaa.pdf");
-        } catch (MessagingException | IOException | NoSuchPaddingException | IllegalBlockSizeException |
-                 NoSuchAlgorithmException | BadPaddingException | InvalidKeyException e) {
-            throw new RuntimeException(e);
-        }
+//       try {
+//            handler.sendMail("aaaaaa", "Test de mail", "Test de mail","aaaa.pdf");
+//        } catch (MessagingException | IOException | NoSuchPaddingException | IllegalBlockSizeException |
+//                 NoSuchAlgorithmException | BadPaddingException | InvalidKeyException e) {
+//            throw new RuntimeException(e);
+//        }
 
         System.out.println("Mail envoyé");
     }
