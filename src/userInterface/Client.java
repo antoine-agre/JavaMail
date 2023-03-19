@@ -17,11 +17,11 @@ public class Client extends Application {
      * Représente l'application client.
      */
 
-    LoginScreen loginScreen;
-    MainScreen mainScreen;
-    SendScreen sendScreen;
-    Stage stage;
-    MailHandler mailHandler;
+    protected LoginScreen loginScreen;
+    protected MainScreen mainScreen;
+    protected SendScreen sendScreen;
+    protected Stage stage;
+    protected MailHandler mailHandler;
 
     public static void main(String[] args) {launch(args);}
 
@@ -33,15 +33,6 @@ public class Client extends Application {
 
         this.mainScreen = new MainScreen(this);
         Scene mainScene = this.mainScreen.getScene();
-
-        //////
-
-//        LoginScreenController.client = this;
-//        MainScreen.client = this;
-//        MainScreenController.client = this;
-//        SendScreenController.client = this;
-
-        //////
 
         this.stage = stage;
         this.stage.setTitle("JavaMail");
@@ -66,4 +57,7 @@ public class Client extends Application {
         sendScreen.start(composeWindow);
     }
 
+    public Stage getStage() {
+        return stage;
+    }
 }

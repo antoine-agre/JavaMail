@@ -16,6 +16,7 @@ public class EMail{
     protected String content;
     protected Boolean hasAttachment;
     protected String fileName = "";
+    protected MimeBodyPart attachmentPart;
     protected Date date;
 
     public EMail(String fromAddress, String subject, String content, Boolean hasAttachment) {
@@ -100,6 +101,7 @@ public class EMail{
             else if (Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition())) {
                 this.hasAttachment = true;
                 this.fileName = bodyPart.getFileName();
+                this.attachmentPart = (MimeBodyPart) bodyPart;
             }
             else if (bodyPart.getContent() instanceof MimeMultipart) {
                 result = parseTextFromMimeMultipart((MimeMultipart) bodyPart.getContent());
@@ -132,5 +134,9 @@ public class EMail{
 
     public String getFileName() {
         return fileName;
+    }
+
+    public MimeBodyPart getAttachmentPart() {
+        return attachmentPart;
     }
 }

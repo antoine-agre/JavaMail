@@ -2,6 +2,8 @@ package mail;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.stage.DirectoryChooser;
+import userInterface.Client;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -12,6 +14,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Properties;
@@ -23,7 +26,8 @@ public class MailHandler {
      */
 
     protected Session session;
-//    protected Store store;
+    protected Store store;
+    protected Folder folderInbox;
     protected String user;
     protected String password;
 //    protected ArrayList<EMail> eMailList = new ArrayList<EMail>();
@@ -45,6 +49,15 @@ public class MailHandler {
         this.session = Session.getInstance(properties);
         this.user = user;
         this.password = password;
+
+        try {
+            this.store = this.session.getStore("imap");
+            this.store.connect(this.user, this.password);
+            this.folderInbox = this.store.getFolder("INBOX");
+            this.folderInbox.open(Folder.READ_ONLY);
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
 
 //        try {
 //            this.store = this.session.getStore("imap");
@@ -130,12 +143,12 @@ public class MailHandler {
 
         try {
 
-            Store store = this.session.getStore("imap");
-            store.connect(this.user, this.password);
-
-            Folder folderInbox = store.getFolder("INBOX");
-            folderInbox.open(Folder.READ_ONLY);
-            Message[] inbox = folderInbox.getMessages();
+//            Store store = this.session.getStore("imap");
+//            store.connect(this.user, this.password);
+//
+//            Folder folderInbox = store.getFolder("INBOX");
+//            folderInbox.open(Folder.READ_ONLY);
+            Message[] inbox = this.folderInbox.getMessages();
             this.eMailList.clear();
 
             for (Message message : inbox) {
@@ -144,13 +157,31 @@ public class MailHandler {
             }
 
             //Disconnect
-            folderInbox.close(false);
-            store.close();
+//            folderInbox.close(false);
+//            store.close();
 
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
 
+    }
+
+    public void downloadAttachment(Client client, EMail eMail) {
+        try {
+
+//            Message[] inbox = folderInbox.getMessages();
+
+            DirectoryChooser dirChooser = new DirectoryChooser();
+            File choosenDir = dirChooser.showDialog(client.getStage());
+            eMail.getAttachmentPart().saveFile(choosenDir + "/" + eMail.getFileName());
+
+            //Disconnect
+//            folderInbox.close(false);
+//            store.close();
+
+        } catch (MessagingException | IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public ObservableList<EMail> getEMailList() {
