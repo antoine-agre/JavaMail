@@ -1,5 +1,10 @@
 package mail;
 
+import Cryptography.AES.AES;
+import Cryptography.AES.AESFileEncryptor;
+import Cryptography.IBE.IBECipherText;
+import Cryptography.IBE.IBEscheme;
+import it.unisa.dia.gas.jpbc.Element;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.stage.DirectoryChooser;
@@ -8,13 +13,20 @@ import userInterface.Client;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Properties;
@@ -32,6 +44,13 @@ public class MailHandler {
     protected String password;
 //    protected ArrayList<EMail> eMailList = new ArrayList<EMail>();
     protected ObservableList<EMail> eMailList = FXCollections.observableArrayList();
+    //Cette initialisation sert uniquer de test
+    //TODO à changer
+    protected IBEscheme pubParams =  new IBEscheme();
+
+    protected File encryptedFilesFolder ;
+    protected File decryptedFilesFolder ;
+
 
     public MailHandler(String smtpServer, String imapServer, String user, String password) {
         Properties properties = new Properties();
@@ -49,6 +68,11 @@ public class MailHandler {
         this.session = Session.getInstance(properties);
         this.user = user;
         this.password = password;
+
+        this.encryptedFilesFolder  = new File("EncryptedFiles/");
+        this.encryptedFilesFolder.mkdirs();
+        this.decryptedFilesFolder = new File("DecryptedFiles/");
+        this.decryptedFilesFolder.mkdirs();
 
         try {
             this.store = this.session.getStore("imap");
@@ -68,12 +92,52 @@ public class MailHandler {
 
     }
 
+    //Create file that contains information about AES key
+    public File AESdecryptionInfos(String name, String AESKey) throws IOException {
+        IBECipherText cipher = this.pubParams.Encryption_Basic_IBE(this.pubParams.getP(), this.pubParams.getPpub(), this.user,AESKey);
+        Element u = cipher.getU();
+        byte[] v = cipher.getV();
+        File AESInfos=new File(this.encryptedFilesFolder, "AES_" + name.replaceFirst("[.][^.]+$",".properties"));
+        AESInfos.createNewFile();
+
+        FileOutputStream outputStream = new FileOutputStream(AESInfos);
+        byte[] inputBytesU = u.toBytes();
+        outputStream.write("u:".getBytes());
+        outputStream.write(inputBytesU);
+        outputStream.write("\nv:".getBytes());
+        outputStream.write(v);
+
+        return AESInfos;
+    }
+
+
+    public File decryptAttachment(String attachmentPath, String AESInfoPath, Element privateKey) throws NoSuchPaddingException, IllegalBlockSizeException, IOException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        //Retrieve AES key infos
+        Properties AESproperties = new Properties();
+        try {
+            AESproperties.load(new FileInputStream(AESInfoPath));
+        } catch(IOException e) {e.printStackTrace();}
+        byte[] u_bytes = AESproperties.getProperty("u").getBytes();
+        Element u = this.pubParams.getG().newElementFromBytes(u_bytes);
+        byte [] v = AESproperties.getProperty("v").getBytes();
+
+        // Decrypt AES key using IBE private key
+        IBECipherText C = new IBECipherText(u,v);
+        byte [] AESprivateKeyBytes = this.pubParams.Decryption_Basic_IBE(this.pubParams.getP(),this.pubParams.getP(),privateKey,C);
+        String AESprivateKey = new String(AESprivateKeyBytes);
+
+        //Decrypt the file using AES key
+        File attachmentFile = new File(attachmentPath);
+        File decryptedAttachmentFile = new File(decryptedFilesFolder,"decrypted_"+attachmentFile.getName());
+        AESFileEncryptor.fileDecrypt(attachmentFile, decryptedAttachmentFile,AESprivateKey);
+
+        return decryptedAttachmentFile;
+    }
+
     /**
      * Envoie un mail de test de l'utilisateur à lui-même, contenant la date et l'heure.
      */
     public void testMail() {
-
-
         try {
             MimeMessage message = new MimeMessage(this.session);
             message.setFrom(this.user);
@@ -108,6 +172,9 @@ public class MailHandler {
     public void sendMail(String recipientAddress, String subject, String textContent, File attachment) {
 
         try {
+            //Random AES Session key
+            String AESKey = AES.randomString();
+
             //Header
             MimeMessage message = new MimeMessage(this.session);
             message.setFrom(this.user);
@@ -115,23 +182,33 @@ public class MailHandler {
             message.setSubject(subject);
 
             //Corps et pièce jointe
-            BodyPart messageBodyPart = new MimeBodyPart();
-            messageBodyPart.setText(textContent);
+            Multipart multipart = new MimeMultipart(); //
 
-            Multipart multipart = new MimeMultipart();
+            MimeBodyPart messageBodyPart = new MimeBodyPart();
+            messageBodyPart.setText(textContent);
             multipart.addBodyPart(messageBodyPart);
 
             messageBodyPart = new MimeBodyPart();
-            DataSource source = new FileDataSource(attachment);
-            messageBodyPart.setDataHandler(new DataHandler(source));
-            messageBodyPart.setFileName(attachment.getName());
+            File encryptedAttachment = new File(this.encryptedFilesFolder, attachment.getName() + ".chiffre");
+            encryptedAttachment.createNewFile();
+            AESFileEncryptor.fileEncrypt(attachment, encryptedAttachment, AESKey);
+            messageBodyPart.attachFile(encryptedAttachment);
+//            DataSource source = new FileDataSource(attachment);
+//            messageBodyPart.setDataHandler(new DataHandler(source));
+//            messageBodyPart.setFileName(attachment.getName());
+            multipart.addBodyPart(messageBodyPart);
+
+            messageBodyPart = new MimeBodyPart();
+            File AESInfos = AESdecryptionInfos(attachment.getName(), AESKey);
+            messageBodyPart.attachFile(AESInfos);
             multipart.addBodyPart(messageBodyPart);
 
             message.setContent(multipart);
 
             //Envoi
             Transport.send(message, this.user, this.password);
-        } catch (MessagingException e) {
+        } catch (MessagingException | IOException | NoSuchPaddingException | IllegalBlockSizeException |
+                 NoSuchAlgorithmException | BadPaddingException | InvalidKeyException e) {
             throw new RuntimeException(e);
         }
     }
