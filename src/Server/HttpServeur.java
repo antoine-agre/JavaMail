@@ -12,12 +12,16 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import Cryptography.IBE.*;
 import Cryptography.ElGamal.*;
 import it.unisa.dia.gas.jpbc.Element;
+import it.unisa.dia.gas.jpbc.Pairing;
+import it.unisa.dia.gas.jpbc.PairingParameters;
+import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
 
 public class HttpServeur {
 
@@ -52,15 +56,21 @@ public class HttpServeur {
 
                     String[] clientDataTable = clientData.split("\n");
                     String emailAddress = clientDataTable[0];
-                    String elGamalPublicKey = clientDataTable[1];
+                    String elGamalPublicKeyString = clientDataTable[1];
+
+                    PairingParameters pairingParams = PairingFactory.getPairingParameters("params/curves/a.properties");
+                    Pairing pairing = PairingFactory.getPairing(pairingParams);
+                    Element elGamalPublicKey = pairing.getZr().newElementFromBytes(Base64.getDecoder().decode(elGamalPublicKeyString));
+
+
+
 
                     System.out.println(emailAddress);
+                    System.out.println(elGamalPublicKeyString);
                     System.out.println(elGamalPublicKey);
 
-                    /*
-                    * Verify client ID
-                    * */
 
+                    //TODO Verify client ID
 
                     Element privateKey = ibe.generate_private_key_ID(emailAddress);
                     /*
