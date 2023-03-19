@@ -104,7 +104,7 @@ public class MainScreenController {
         EMail selectedEMail = this.tableView.getSelectionModel().getSelectedItem();
         if (selectedEMail.getHasAttachment()) {
             if (selectedEMail.getEncrypted()) {
-                //décrypter et télécharger
+                client.mailHandler.downloadEncryptedAttachment(client, selectedEMail);
             } else {
                 client.mailHandler.downloadAttachment(client, selectedEMail);
             }

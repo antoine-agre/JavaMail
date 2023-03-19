@@ -25,6 +25,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
@@ -111,11 +113,11 @@ public class MailHandler {
     }
 
 
-    public File decryptAttachment(File attachmentFile, String AESInfoPath, Element privateKey) throws NoSuchPaddingException, IllegalBlockSizeException, IOException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+    public File decryptAttachment(File attachmentFile, File AESInfoFile, Element privateKey) throws NoSuchPaddingException, IllegalBlockSizeException, IOException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         //Retrieve AES key infos
         Properties AESproperties = new Properties();
         try {
-            AESproperties.load(new FileInputStream(AESInfoPath));
+            AESproperties.load(new FileInputStream(AESInfoFile));
         } catch(IOException e) {e.printStackTrace();}
         byte[] u_bytes = AESproperties.getProperty("u").getBytes();
         Element u = this.pubParams.getG().newElementFromBytes(u_bytes);
@@ -128,7 +130,9 @@ public class MailHandler {
 
         //Decrypt the file using AES key
 //        File attachmentFile = new File(attachmentPath);
-        File decryptedAttachmentFile = new File(decryptedFilesFolder,"decrypted_"+attachmentFile.getName());
+        String newFileName = attachmentFile.getName();
+        newFileName = newFileName.substring(0, newFileName.length() - 8);
+        File decryptedAttachmentFile = new File(decryptedFilesFolder, newFileName);
         AESFileEncryptor.fileDecrypt(attachmentFile, decryptedAttachmentFile,AESprivateKey);
 
         return decryptedAttachmentFile;
@@ -257,6 +261,45 @@ public class MailHandler {
 //            store.close();
 
         } catch (MessagingException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void downloadEncryptedAttachment(Client client, EMail eMail) {
+        try {
+
+//            Message[] inbox = folderInbox.getMessages();
+
+            DirectoryChooser dirChooser = new DirectoryChooser();
+            File choosenDir = dirChooser.showDialog(client.getStage());
+
+            eMail.getAttachmentPart().saveFile("DecryptedFiles/" + eMail.getAttachmentPart().getFileName());
+            eMail.getPropertiesPart().saveFile("DecryptedFiles/" + eMail.getPropertiesPart().getFileName());
+
+            File attachmentFile = new File("DecryptedFiles/" + eMail.getAttachmentPart().getFileName());
+            File propertiesFile = new File("DecryptedFiles/" + eMail.getPropertiesPart().getFileName());
+
+            File decryptedFile = decryptAttachment(attachmentFile, propertiesFile, pubParams.generate_private_key_ID(this.user));
+
+            Files.copy(decryptedFile.toPath(), Path.of(choosenDir.toString() + "/" + decryptedFile.getName()))  ;
+//            decryptedFile.
+//            eMail.getAttachmentPart().saveFile(choosenDir + "/" + eMail.getFileName());
+
+            //Disconnect
+//            folderInbox.close(false);
+//            store.close();
+
+        } catch (MessagingException | IOException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchPaddingException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalBlockSizeException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        } catch (BadPaddingException e) {
+            throw new RuntimeException(e);
+        } catch (InvalidKeyException e) {
             throw new RuntimeException(e);
         }
     }

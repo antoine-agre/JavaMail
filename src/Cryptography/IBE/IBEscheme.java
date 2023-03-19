@@ -79,7 +79,7 @@ public class IBEscheme {
         return PP;
     }
 
-    protected Element generate_private_key_ID(String ID){
+    public Element generate_private_key_ID(String ID){
         if (Key_couples.get(ID) == null) {
             byte[] IDbytes = ID.getBytes();
             //On applique la fonction de hachage H1 à l'ID
