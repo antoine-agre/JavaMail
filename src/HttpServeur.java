@@ -34,9 +34,14 @@ public class HttpServeur {
                 public void handle(HttpExchange he) throws IOException {
                     byte[] bytes1 = new byte[Integer.parseInt(he.getRequestHeaders().getFirst("Content-length"))];
                     he.getRequestBody().read(bytes1);
-                    String msg = new String(bytes1);
+                    String clientData = new String(bytes1);
 
-                    System.out.println("message reçu " + msg);
+                    String[] clientDataTable = clientData.split("\n");
+                    String emailAddress = clientDataTable[0];
+                    String elGamalPublicKey = clientDataTable[1];
+
+                    System.out.println("message reçu " + emailAddress);
+                    System.out.println("message reçu " + elGamalPublicKey);
 
                     byte[] bytes = "bonjour client ..".getBytes();
 

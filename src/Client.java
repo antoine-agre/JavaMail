@@ -52,12 +52,15 @@ public class Client {
             URLConnection urlConn = SERVER_URL.openConnection();
             urlConn.setDoInput(true);
             urlConn.setDoOutput(true);
+
             OutputStream out = urlConn.getOutputStream();
-            out.write(emailAddress.getBytes());
+            String emailMsg = emailAddress + "\n";
+            out.write(emailMsg.getBytes());
 
             generateElGamalKeyPair();
             Element publicKey = elGamalKeyPair.publicKey();
-            out.write(publicKey.toString().getBytes());
+            String publicKeyMsg = publicKey.toString() + "\n";
+            out.write(publicKeyMsg.getBytes());
 
             InputStream dis = urlConn.getInputStream();
             byte[] b = new byte[Integer.parseInt(urlConn.getHeaderField("Content-length"))];
