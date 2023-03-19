@@ -33,7 +33,7 @@ public class MailTest {
                 loginProperties.getProperty("password")
         );
        try {
-            handler.sendMail("issa.mboup314@gmail.com", "Test de mail", "Test de mail","/home/issa/Courses/Networking/Exercices - 03 - OSPF - élèves -.pdf");
+            handler.sendMail("aaaaaa", "Test de mail", "Test de mail","aaaa.pdf");
         } catch (MessagingException | IOException | NoSuchPaddingException | IllegalBlockSizeException |
                  NoSuchAlgorithmException | BadPaddingException | InvalidKeyException e) {
             throw new RuntimeException(e);
