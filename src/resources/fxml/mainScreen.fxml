@@ -130,6 +130,11 @@
                                        <font>
                                           <Font name="Segoe UI" size="14.0" />
                                        </font></Label>
+                                    <Label fx:id="encryptedMessage" text="Chiffré" textFill="#bf1414" visible="false">
+                                       <font>
+                                          <Font name="Segoe UI" size="18.0" />
+                                       </font>
+                                    </Label>
                                     <Button fx:id="attachmentButton" disable="true" mnemonicParsing="false" onAction="#downloadAttachment" text="Télécharger">
                                        <font>
                                           <Font name="Segoe UI" size="18.0" />

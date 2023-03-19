@@ -41,6 +41,7 @@ public class MainScreenController {
     @FXML protected Label attachmentName;
     @FXML protected Button attachmentButton;
     @FXML protected Label attachmentMessage;
+    @FXML protected Label encryptedMessage;
 
     @FXML
     public void initialize() {
@@ -82,9 +83,13 @@ public class MainScreenController {
         this.focusDate.setText(eMail.getDate().toString());
         this.focusContent.setText(eMail.getContent());
         this.attachmentMessage.setVisible(false);
+        this.encryptedMessage.setVisible(false);
         if (eMail.getHasAttachment()) {
-            this.attachmentName.setText(eMail.getFileName());
+            if (eMail.getEncrypted()) {
+                this.encryptedMessage.setVisible(true);
+            }
             this.attachmentButton.setDisable(false);
+            this.attachmentName.setText(eMail.getFileName());
         } else {
             this.attachmentName.setText("Pas de pièce jointe");
             this.attachmentButton.setDisable(true);
@@ -98,7 +103,11 @@ public class MainScreenController {
     public void downloadAttachment() {
         EMail selectedEMail = this.tableView.getSelectionModel().getSelectedItem();
         if (selectedEMail.getHasAttachment()) {
-            client.mailHandler.downloadAttachment(client, selectedEMail);
+            if (selectedEMail.getEncrypted()) {
+                //décrypter et télécharger
+            } else {
+                client.mailHandler.downloadAttachment(client, selectedEMail);
+            }
             this.attachmentMessage.setVisible(true);
         }
     }

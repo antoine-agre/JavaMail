@@ -15,8 +15,10 @@ public class EMail{
     protected String subject;
     protected String content;
     protected Boolean hasAttachment;
+    protected Boolean isEncrypted = false;
     protected String fileName = "";
     protected MimeBodyPart attachmentPart;
+    protected MimeBodyPart propertiesPart;
     protected Date date;
 
     public EMail(String fromAddress, String subject, String content, Boolean hasAttachment) {
@@ -100,8 +102,16 @@ public class EMail{
             }
             else if (Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition())) {
                 this.hasAttachment = true;
-                this.fileName = bodyPart.getFileName();
-                this.attachmentPart = (MimeBodyPart) bodyPart;
+                if (bodyPart.getFileName().endsWith(".chiffre")) {
+                    this.isEncrypted = true;
+                    this.attachmentPart = (MimeBodyPart) bodyPart;
+                    this.fileName = bodyPart.getFileName();
+                } else if (bodyPart.getFileName().endsWith(".properties")) {
+                    this.propertiesPart = (MimeBodyPart) bodyPart;
+                } else {
+                    this.attachmentPart = (MimeBodyPart) bodyPart;
+                    this.fileName = bodyPart.getFileName();
+                }
             }
             else if (bodyPart.getContent() instanceof MimeMultipart) {
                 result = parseTextFromMimeMultipart((MimeMultipart) bodyPart.getContent());
@@ -126,6 +136,14 @@ public class EMail{
 
     public Boolean getHasAttachment() {
         return hasAttachment;
+    }
+
+    public Boolean getEncrypted() {
+        return isEncrypted;
+    }
+
+    public MimeBodyPart getPropertiesPart() {
+        return propertiesPart;
     }
 
     public Date getDate() {

@@ -111,7 +111,7 @@ public class MailHandler {
     }
 
 
-    public File decryptAttachment(String attachmentPath, String AESInfoPath, Element privateKey) throws NoSuchPaddingException, IllegalBlockSizeException, IOException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+    public File decryptAttachment(File attachmentFile, String AESInfoPath, Element privateKey) throws NoSuchPaddingException, IllegalBlockSizeException, IOException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         //Retrieve AES key infos
         Properties AESproperties = new Properties();
         try {
@@ -127,7 +127,7 @@ public class MailHandler {
         String AESprivateKey = new String(AESprivateKeyBytes);
 
         //Decrypt the file using AES key
-        File attachmentFile = new File(attachmentPath);
+//        File attachmentFile = new File(attachmentPath);
         File decryptedAttachmentFile = new File(decryptedFilesFolder,"decrypted_"+attachmentFile.getName());
         AESFileEncryptor.fileDecrypt(attachmentFile, decryptedAttachmentFile,AESprivateKey);
 
