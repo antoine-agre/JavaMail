@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
 public class IBEscheme {
-    static protected Pairing pairing = PairingFactory.getPairing("/home/issa/Courses/AdvCrypto/JavaMail/src/Cryptography/params/curves/a.properties");
+    static protected Pairing pairing = PairingFactory.getPairing("src/params/curves/a.properties");
     static protected Field Zr = pairing.getZr();
     static protected Field G = pairing.getG1();
     static protected Field GT= pairing.getGT();
@@ -76,7 +76,7 @@ public class IBEscheme {
     //Fonction qui genere la clé privé maitre et gere la lecture dans un fichier
     protected void generate_PMK_P(){
         //Fichier de configuration pour stocker la clé secrète
-        String configFilePath = "Cryptography/IBE/PKM.properties";
+        String configFilePath = "src/Cryptography/IBE/PKM.properties";
         Properties prop = new Properties();
         InputStream in;
         try {
