@@ -1,14 +1,18 @@
 package Cryptography.IBE;
-
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Field;
 import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
+import it.unisa.dia.gas.plaf.jpbc.util.io.Base64;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
-
+import java.util.Properties;
 public class IBEscheme {
     static protected Pairing pairing = PairingFactory.getPairing("params/curves/a.properties");
     static protected Field Zr = pairing.getZr();
@@ -27,7 +31,7 @@ public class IBEscheme {
     protected void New_Set_Up_IBE(){
         generate_PMK_P();
         this.Ppub = (this.P).duplicate().mulZn(this.private_key_master);
-         //On reconstruit les clés privé es utilisateurs
+        //On reconstruit les clés privé es utilisateurs
         Key_couples.clear();
         build_HashMap();
     }
@@ -36,39 +40,38 @@ public class IBEscheme {
     protected void generate_PMK_P(){
         //Fichier de configuration pour stocker la clé secrète
         String configFilePath = "/Users/auger/Documents/GitHub/JavaMail/src/Cryptography/IBE/PKM.properties";
-        Properties Parameters = new Properties();
+        Properties prop = new Properties();
+        InputStream in;
         try {
-            Parameters.load(new FileInputStream(configFilePath));
+            in = new FileInputStream(configFilePath);
+            prop.load(in);
         } catch(IOException e) {e.printStackTrace();}
-        String chaine = Parameters.getProperty("PKM");
-        String chaine2 = Parameters.getProperty("P");
-        if (chaine.length() != 0){
-            //La clé existe et est stocké dans le fichier
-            System.out.println("Lecture depuis fichier");
-            byte[] bytes = chaine.getBytes();
-            byte[] bytes2 = chaine2.getBytes();
-            Element e = Zr.newElement();
-            Element f = G.newElement();
-            this.private_key_master = e.setFromHash(bytes, 0, bytes.length).duplicate();
-            this.P = e.setFromHash(bytes2, 0, bytes2.length).duplicate();
+        String chaine = prop.getProperty("PKM");
+        String chaine2 = prop.getProperty("P");
+        if (chaine.length() != 0 && chaine2.length() != 0){//La clé existe et est stocké dans le fichier
+            try{
+                this.private_key_master = Zr.newElementFromBytes(Base64.decode(chaine));
+                this.P = G.newElementFromBytes(Base64.decode(chaine2));
+            } catch(IOException e) {e.printStackTrace();}
         }
-        else {
-            //Elle est générée et stockée dans un fichier
+        else {//Elle est générée et stockée dans un fichier
             System.out.println("Stockage dans le fichier");
             this.private_key_master = Zr.newRandomElement();
             this.P = G.newRandomElement();
-            Parameters.put("PKM", this.private_key_master.toString());
-            Parameters.put("P", this.P.toString());
+            try{
+                //On convertit les Elements en string
+                prop.setProperty("PKM", Base64.encodeBytes(this.private_key_master.toBytes()));
+                prop.setProperty("P", Base64.encodeBytes(this.P.toBytes()));
+                prop.store(new FileOutputStream(configFilePath), null);
+            } catch(IOException e) {e.printStackTrace();}
         }
     }
-
     protected Element[] Pubic_Parameters(){
         Element[] PP = new Element[2];
         PP[0] = this.P;
         PP[1] = this.Ppub;
         return PP;
     }
-
     protected Element generate_private_key_ID(String ID){
         if (Key_couples.get(ID) == null) {
             byte[] IDbytes = ID.getBytes();
@@ -82,7 +85,6 @@ public class IBEscheme {
         }
         else {return Key_couples.get(ID);}
     }
-
     protected void build_HashMap(){
         for (String adresse: IDs){generate_private_key_ID(adresse);}
     }
@@ -104,20 +106,16 @@ public class IBEscheme {
         C.setV(XOR(message.getBytes(), C.getV()));
         return C;
     }
-
     protected byte[] Decryption_Basic_IBE(Element P, Element Ppub, Element private_key_ID, IBECipherText C){
         byte[] M2 = pairing.pairing(private_key_ID, C.getU()).toBytes();
         byte[] M = XOR(C.getV(), M2);
         return M;
     }
 
-
-    public static void main(String[] args) {
+    public static void main(String[] args){
         IBEscheme schema = new IBEscheme();
         IBECipherText cypher = schema.Encryption_Basic_IBE(schema.P, schema.Ppub, "antoine.auger27@gmail.com", "Bonjour Antoine, comment vas-tu ?");
         byte[] plaintext = schema.Decryption_Basic_IBE(schema.P, schema.P, schema.generate_private_key_ID("antoine.auger27@gmail.com"), cypher);
         System.out.println(new String(plaintext, StandardCharsets.US_ASCII));
     }
-
-
 }
