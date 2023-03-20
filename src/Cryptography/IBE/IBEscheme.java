@@ -21,17 +21,45 @@ public class IBEscheme {
     protected ArrayList<String> IDs= new ArrayList();
 
     public IBEscheme(){
-        this.private_key_master = Zr.newRandomElement();
-        this.P = G.newRandomElement();
+        generate_PMK_P();
         this.Ppub = P.duplicate().mulZn(private_key_master);
     }
     protected void New_Set_Up_IBE(){
-        this.P = G.newRandomElement();
-        this.private_key_master = Zr.newRandomElement();
+        generate_PMK_P();
         this.Ppub = (this.P).duplicate().mulZn(this.private_key_master);
          //On reconstruit les clés privé es utilisateurs
         Key_couples.clear();
         build_HashMap();
+    }
+
+    //Fonction qui genere la clé privé maitre et gere la lecture dans un fichier
+    protected void generate_PMK_P(){
+        //Fichier de configuration pour stocker la clé secrète
+        String configFilePath = "/Users/auger/Documents/GitHub/JavaMail/src/Cryptography/IBE/PKM.properties";
+        Properties Parameters = new Properties();
+        try {
+            Parameters.load(new FileInputStream(configFilePath));
+        } catch(IOException e) {e.printStackTrace();}
+        String chaine = Parameters.getProperty("PKM");
+        String chaine2 = Parameters.getProperty("P");
+        if (chaine.length() != 0){
+            //La clé existe et est stocké dans le fichier
+            System.out.println("Lecture depuis fichier");
+            byte[] bytes = chaine.getBytes();
+            byte[] bytes2 = chaine2.getBytes();
+            Element e = Zr.newElement();
+            Element f = G.newElement();
+            this.private_key_master = e.setFromHash(bytes, 0, bytes.length).duplicate();
+            this.P = e.setFromHash(bytes2, 0, bytes2.length).duplicate();
+        }
+        else {
+            //Elle est générée et stockée dans un fichier
+            System.out.println("Stockage dans le fichier");
+            this.private_key_master = Zr.newRandomElement();
+            this.P = G.newRandomElement();
+            Parameters.put("PKM", this.private_key_master.toString());
+            Parameters.put("P", this.P.toString());
+        }
     }
 
     protected Element[] Pubic_Parameters(){
