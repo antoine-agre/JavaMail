@@ -29,14 +29,14 @@ public class HttpServeur {
 
     static IBEscheme ibe = new IBEscheme();
 
-
+    //TODO Verify client ID
     /**
      * verifie si l'identite specifiee est bien celle du client en envoyant un mail de confirmation
      *
      * @param emailAddress l'adresse mail sur laquelle le message de verification est envoye
      * @return true si l'identite est verifiee, false sinon
      */
-    public boolean verifyClientId(String emailAddress) {
+    public static boolean verifyClientId(String emailAddress) {
 
         return true;
     }
@@ -67,37 +67,36 @@ public class HttpServeur {
 
                     System.out.println(elGamalPublicKey);
 
-                    //TODO Verify client ID
+                    if (verifyClientId(emailAddress)) {
+                        Element privateKey = ibe.generate_private_key_ID(emailAddress);
 
-                    Element privateKey = ibe.generate_private_key_ID(emailAddress);
+                        CipherText encryptedPrivateKey = encrypt(privateKey, elGamalPublicKey, pairing, generator);
 
-                    CipherText encryptedPrivateKey = encrypt(privateKey, elGamalPublicKey, pairing,generator);
-
-                    Element[] PP = ibe.Public_Parameters();
-
-
-                    System.out.println(encryptedPrivateKey);
-                    System.out.println(PP[0]);
-                    System.out.println(PP[1]);
+                        Element[] PP = ibe.Public_Parameters();
 
 
-                    byte[] c1 = encryptedPrivateKey.c1().toBytes();
-                    byte[] c2 = encryptedPrivateKey.c2().toBytes();
-                    byte[] P = PP[0].toBytes();
-                    byte[] Ppub = PP[1].toBytes();
+                        System.out.println(encryptedPrivateKey);
+                        System.out.println(PP[0]);
+                        System.out.println(PP[1]);
 
 
-                    he.sendResponseHeaders(200, c1.length + c2.length + P.length + Ppub.length);
-                    System.out.println(c1.length + c2.length + P.length + Ppub.length);
-                    OutputStream os = he.getResponseBody();
+                        byte[] c1 = encryptedPrivateKey.c1().toBytes();
+                        byte[] c2 = encryptedPrivateKey.c2().toBytes();
+                        byte[] P = PP[0].toBytes();
+                        byte[] Ppub = PP[1].toBytes();
 
-                    os.write(c1);
-                    os.write(c2);
-                    os.write(P);
-                    os.write(Ppub);
-                    System.out.println("sending response done....");
-                    os.close();
 
+                        he.sendResponseHeaders(200, c1.length + c2.length + P.length + Ppub.length);
+                        System.out.println(c1.length + c2.length + P.length + Ppub.length);
+                        OutputStream os = he.getResponseBody();
+
+                        os.write(c1);
+                        os.write(c2);
+                        os.write(P);
+                        os.write(Ppub);
+                        System.out.println("sending response done....");
+                        os.close();
+                    }
                 }
             });
 
