@@ -54,28 +54,29 @@ public class HttpServeur {
                     he.getRequestBody().read(bytes1);
                     String clientData = new String(bytes1);
 
-                    String[] clientDataTable = clientData.split("\n");
-                    String emailAddress = clientDataTable[0];
-                    String elGamalPublicKeyString = clientDataTable[1];
 
                     PairingParameters pairingParams = PairingFactory.getPairingParameters("params/curves/a.properties");
                     Pairing pairing = PairingFactory.getPairing(pairingParams);
-                    Element elGamalPublicKey = pairing.getZr().newElementFromBytes(Base64.getDecoder().decode(elGamalPublicKeyString));
+                    Element elGamalPublicKey = pairing.getZr().newElement();
+                    elGamalPublicKey.setFromBytes(bytes1);
 
-
-
-
-                    System.out.println(emailAddress);
-                    System.out.println(elGamalPublicKeyString);
                     System.out.println(elGamalPublicKey);
 
+                    byte[] bytes = "bonjour client ..".getBytes();
 
+                         he.sendResponseHeaders(200, bytes.length);
+
+                         OutputStream os = he.getResponseBody();
+
+                         os.write(bytes);
+                         System.out.println("sending response done....");
+                         os.close();
                     //TODO Verify client ID
-
+/*
                     Element privateKey = ibe.generate_private_key_ID(emailAddress);
-                    /*
+
                     CipherText encryptedPrivateKey = encrypt(privateKey, keyPair.publicKey(), pairing,generator);
-                    */
+
 
                     Element[] PP = ibe.Public_Parameters();
 
@@ -99,6 +100,8 @@ public class HttpServeur {
                     os.write(Ppub);
                     System.out.println("sending response done....");
                     os.close();
+
+ */
                 }
             });
 
