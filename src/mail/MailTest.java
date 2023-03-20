@@ -4,6 +4,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.mail.MessagingException;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -20,7 +21,9 @@ public class MailTest {
 
         try {
             loginProperties.load(new FileInputStream(configFilePath));
-        } catch(IOException e) {e.printStackTrace();}
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         System.out.println("user prop : " + loginProperties.getProperty("user"));
         System.out.println("pswd prop : " + loginProperties.getProperty("password"));
@@ -32,13 +35,11 @@ public class MailTest {
                 loginProperties.getProperty("user"),
                 loginProperties.getProperty("password")
         );
-       try {
-            handler.sendMail("aaaaaa", "Test de mail", "Test de mail","aaaa.pdf");
-        } catch (MessagingException | IOException | NoSuchPaddingException | IllegalBlockSizeException |
-                 NoSuchAlgorithmException | BadPaddingException | InvalidKeyException e) {
-            throw new RuntimeException(e);
-        }
 
-        System.out.println("Mail envoyé");
+        File file = new File("/home/issa/Courses/AdvCrypto/JavaMail/EncryptedFiles/file1.txt");
+        handler.sendMail("aaaaaa", "Test de mail", "Test de mail", file);
+
+        System.out.println("Mail envoté");
+
     }
 }

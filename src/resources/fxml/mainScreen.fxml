@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="768.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="userInterface.MainScreenController">
+   <children>
+      <MenuBar>
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Close" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem mnemonicParsing="false" onAction="#addTestLine" text="Add Test Line" />
+                  <MenuItem mnemonicParsing="false" onAction="#refreshMails" text="Refresh E-Mails" />
+                  <MenuItem mnemonicParsing="false" onAction="#composeMail" text="New Mail" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+      <SplitPane dividerPositions="0.37926136363636365" orientation="VERTICAL" prefHeight="200.0" prefWidth="1366.0" VBox.vgrow="ALWAYS">
+        <items>
+            <TableView fx:id="tableView" fixedCellSize="25.0" prefHeight="200.0" prefWidth="1366.0">
+              <columns>
+                  <TableColumn fx:id="dateColumn" editable="false" prefWidth="114.66662650108356" text="Date" />
+                <TableColumn fx:id="fromColumn" editable="false" prefWidth="254.93338775634766" sortable="false" text="Expéditeur" />
+                <TableColumn fx:id="subjectColumn" editable="false" minWidth="6.399993896484375" prefWidth="235.99996948242188" sortable="false" text="Sujet" />
+                  <TableColumn fx:id="previewColumn" editable="false" prefWidth="655.7332153320312" sortable="false" text="Corps du mail" />
+                  <TableColumn fx:id="attachmentColumn" editable="false" prefWidth="105.0667724609375" sortable="false" text="Pièce Jointe" />
+              </columns>
+            </TableView>
+            <VBox prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <GridPane prefHeight="68.0" prefWidth="1366.0">
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="610.1999877929687" minWidth="10.0" prefWidth="610.1999877929687" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="932.7999023437499" minWidth="10.0" prefWidth="616.133349609375" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="286.20001220703125" minWidth="10.0" prefWidth="121.46665039062509" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints maxHeight="90.60001220703126" minHeight="10.0" prefHeight="11.400018310546876" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="90.60001220703126" minHeight="0.0" prefHeight="9.599981689453124" vgrow="SOMETIMES" />
+                     </rowConstraints>
+                     <children>
+                        <Label fx:id="focusSubject" text="Sujet" GridPane.columnSpan="2" GridPane.halignment="CENTER">
+                           <font>
+                              <Font name="Segoe UI Bold" size="24.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="focusDate" text="Date" textAlignment="RIGHT" GridPane.columnIndex="2" GridPane.halignment="RIGHT">
+                           <GridPane.margin>
+                              <Insets right="10.0" />
+                           </GridPane.margin>
+                           <font>
+                              <Font name="Segoe UI" size="12.0" />
+                           </font>
+                        </Label>
+                        <HBox alignment="BASELINE_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="5.0" GridPane.rowIndex="1">
+                           <children>
+                              <Label text="From :">
+                                 <font>
+                                    <Font size="18.0" />
+                                 </font>
+                              </Label>
+                              <Text fx:id="focusFrom" strokeType="OUTSIDE" strokeWidth="0.0">
+                                 <font>
+                                    <Font name="Segoe UI" size="14.0" />
+                                 </font>
+                              </Text>
+                           </children>
+                        </HBox>
+                        <HBox alignment="BASELINE_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                           <children>
+                              <Label text="To :">
+                                 <font>
+                                    <Font size="18.0" />
+                                 </font>
+                              </Label>
+                              <Text fx:id="focusTo" strokeType="OUTSIDE" strokeWidth="0.0">
+                                 <font>
+                                    <Font name="Segoe UI" size="14.0" />
+                                 </font>
+                              </Text>
+                           </children>
+                        </HBox>
+                     </children>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <padding>
+                        <Insets left="10.0" right="10.0" />
+                     </padding>
+                  </GridPane>
+                  <Separator prefWidth="200.0" />
+                  <BorderPane prefHeight="83.0" prefWidth="803.0" VBox.vgrow="ALWAYS">
+                     <right>
+                        <HBox alignment="CENTER_LEFT" prefHeight="386.0" prefWidth="270.0" BorderPane.alignment="CENTER">
+                           <children>
+                              <Separator orientation="VERTICAL" prefHeight="200.0">
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin></Separator>
+                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="20.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label fx:id="attachmentName" ellipsisString="[...]" text="Pas de pièce jointe" textAlignment="CENTER" textOverrun="CENTER_ELLIPSIS" wrapText="true">
+                                       <font>
+                                          <Font name="Segoe UI" size="14.0" />
+                                       </font></Label>
+                                    <Label fx:id="encryptedMessage" text="Chiffré" textFill="#bf1414" visible="false">
+                                       <font>
+                                          <Font name="Segoe UI" size="18.0" />
+                                       </font>
+                                    </Label>
+                                    <Button fx:id="attachmentButton" disable="true" mnemonicParsing="false" onAction="#downloadAttachment" text="Télécharger">
+                                       <font>
+                                          <Font name="Segoe UI" size="18.0" />
+                                       </font>
+                                    </Button>
+                                    <Label fx:id="attachmentMessage" text="Téléchargé !" textFill="#00a911" visible="false">
+                                       <font>
+                                          <Font name="Segoe UI" size="18.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                     </right>
+                     <center>
+                        <Label fx:id="focusContent" alignment="TOP_LEFT" text="Corps" wrapText="true" BorderPane.alignment="TOP_LEFT">
+                           <font>
+                              <Font name="Segoe UI" size="12.0" />
+                           </font>
+                           <BorderPane.margin>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </BorderPane.margin>
+                        </Label>
+                     </center>
+                  </BorderPane>
+               </children>
+            </VBox>
+        </items>
+      </SplitPane>
+   </children>
+</VBox>
