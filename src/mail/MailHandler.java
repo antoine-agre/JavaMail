@@ -96,8 +96,8 @@ public class MailHandler {
     }
 
     //Create file that contains information about AES key
-    public File AESdecryptionInfos(String name, String AESKey) throws IOException {
-        IBECipherText cipher = this.pubParams.Encryption_Basic_IBE(this.pubParams.getP(), this.pubParams.getPpub(), this.user,AESKey);
+    public File AESdecryptionInfos(String name, String AESKey, String recipientAddress) throws IOException {
+        IBECipherText cipher = this.pubParams.Encryption_Basic_IBE(this.pubParams.getP(), this.pubParams.getPpub(), recipientAddress, AESKey);
         Element u = cipher.getU();
         byte[] v = cipher.getV();
         File AESInfos=new File(this.encryptedFilesFolder, "AES_" + name.replaceFirst("[.][^.]+$",".properties"));
@@ -209,7 +209,7 @@ public class MailHandler {
             multipart.addBodyPart(messageBodyPart);
 
             messageBodyPart = new MimeBodyPart();
-            File AESInfos = AESdecryptionInfos(attachment.getName(), AESKey);
+            File AESInfos = AESdecryptionInfos(attachment.getName(), AESKey, recipientAddress);
             messageBodyPart.attachFile(AESInfos);
             multipart.addBodyPart(messageBodyPart);
 
