@@ -1,17 +1,21 @@
 package Cryptography.IBE;
-
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Field;
 import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
+import it.unisa.dia.gas.plaf.jpbc.util.io.Base64;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
-
+import java.util.Properties;
 public class IBEscheme {
-    static protected Pairing pairing = PairingFactory.getPairing(Path.of("src/Cryptography/param/a.properties").toString());
+    static protected Pairing pairing = PairingFactory.getPairing("src/params/curves/a.properties");
     static protected Field Zr = pairing.getZr();
     static protected Field G = pairing.getG1();
     static protected Field GT= pairing.getGT();
@@ -22,8 +26,7 @@ public class IBEscheme {
     protected ArrayList<String> IDs= new ArrayList();
 
     public IBEscheme(){
-        this.private_key_master = Zr.newRandomElement();
-        this.P = G.newRandomElement();
+        generate_PMK_P();
         this.Ppub = P.duplicate().mulZn(private_key_master);
     }
 
@@ -64,15 +67,44 @@ public class IBEscheme {
     }
 
     protected void New_Set_Up_IBE(){
-        this.P = G.newRandomElement();
-        this.private_key_master = Zr.newRandomElement();
+        generate_PMK_P();
         this.Ppub = (this.P).duplicate().mulZn(this.private_key_master);
-         //On reconstruit les clés privé es utilisateurs
+        //On reconstruit les clés privés et utilisateurs
         Key_couples.clear();
         build_HashMap();
     }
 
-    protected Element[] Pubic_Parameters(){
+    //Fonction qui genere la clé privé maitre et gere la lecture dans un fichier
+    protected void generate_PMK_P(){
+        //Fichier de configuration pour stocker la clé secrète
+        String configFilePath = "src/Cryptography/IBE/PKM.properties";
+        Properties prop = new Properties();
+        InputStream in;
+        try {
+            in = new FileInputStream(configFilePath);
+            prop.load(in);
+        } catch(IOException e) {e.printStackTrace();}
+        String chaine = prop.getProperty("PKM");
+        String chaine2 = prop.getProperty("P");
+        if (chaine.length() != 0 && chaine2.length() != 0){//La clé existe et est stocké dans le fichier
+            try{
+                this.private_key_master = Zr.newElementFromBytes(Base64.decode(chaine));
+                this.P = G.newElementFromBytes(Base64.decode(chaine2));
+            } catch(IOException e) {e.printStackTrace();}
+        }
+        else {//Elle est générée et stockée dans un fichier
+            this.private_key_master = Zr.newRandomElement();
+            this.P = G.newRandomElement();
+            try{
+                //On convertit les Elements en string
+                prop.setProperty("PKM", Base64.encodeBytes(this.private_key_master.toBytes()));
+                prop.setProperty("P", Base64.encodeBytes(this.P.toBytes()));
+                prop.store(new FileOutputStream(configFilePath), null);
+            } catch(IOException e) {e.printStackTrace();}
+        }
+    }
+
+    public Element[] Public_Parameters(){
         Element[] PP = new Element[2];
         PP[0] = this.P;
         PP[1] = this.Ppub;
@@ -92,7 +124,6 @@ public class IBEscheme {
         }
         else {return Key_couples.get(ID);}
     }
-
     protected void build_HashMap(){
         for (String adresse: IDs){generate_private_key_ID(adresse);}
     }
@@ -114,20 +145,16 @@ public class IBEscheme {
         C.setV(XOR(message.getBytes(), C.getV()));
         return C;
     }
-
     public byte[] Decryption_Basic_IBE(Element P, Element Ppub, Element private_key_ID, IBECipherText C){
         byte[] M2 = pairing.pairing(private_key_ID, C.getU()).toBytes();
         byte[] M = XOR(C.getV(), M2);
         return M;
     }
 
-
-    public static void main(String[] args) {
+    public static void main(String[] args){
         IBEscheme schema = new IBEscheme();
         IBECipherText cypher = schema.Encryption_Basic_IBE(schema.P, schema.Ppub, "antoine.auger27@gmail.com", "Bonjour Antoine, comment vas-tu ?");
         byte[] plaintext = schema.Decryption_Basic_IBE(schema.P, schema.P, schema.generate_private_key_ID("antoine.auger27@gmail.com"), cypher);
         System.out.println(new String(plaintext, StandardCharsets.US_ASCII));
     }
-
-
 }
