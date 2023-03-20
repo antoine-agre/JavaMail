@@ -54,6 +54,8 @@ public class HttpServeur {
                     he.getRequestBody().read(bytes1);
                     String clientData = new String(bytes1);
 
+                    String emailAddress = clientData.split("\n")[1];
+                    System.out.println(emailAddress);
 
                     PairingParameters pairingParams = PairingFactory.getPairingParameters("params/curves/a.properties");
                     Pairing pairing = PairingFactory.getPairing(pairingParams);

@@ -60,6 +60,11 @@ public class Client {
             System.out.println(publicKey);
             out.write(publicKey.toBytes());
 
+            out.write("\n".getBytes());
+
+            String emailMsg = emailAddress;
+            out.write(emailMsg.getBytes());
+
             InputStream dis = urlConn.getInputStream();
             byte[] b = new byte[Integer.parseInt(urlConn.getHeaderField("Content-length"))];
             dis.read(b);
