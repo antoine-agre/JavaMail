@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
 public class IBEscheme {
-    static protected Pairing pairing = PairingFactory.getPairing("params/curves/a.properties");
+    static protected Pairing pairing = PairingFactory.getPairing("/home/issa/Courses/AdvCrypto/JavaMail/src/Cryptography/params/curves/a.properties");
     static protected Field Zr = pairing.getZr();
     static protected Field G = pairing.getG1();
     static protected Field GT= pairing.getGT();
@@ -28,6 +28,43 @@ public class IBEscheme {
         generate_PMK_P();
         this.Ppub = P.duplicate().mulZn(private_key_master);
     }
+
+    public static Pairing getPairing() {
+        return pairing;
+    }
+
+    public static Field getZr() {
+        return Zr;
+    }
+
+    public static Field getG() {
+        return G;
+    }
+
+    public static Field getGT() {
+        return GT;
+    }
+
+    public Element getP() {
+        return P;
+    }
+
+    public Element getPpub() {
+        return Ppub;
+    }
+
+    public Element getPrivate_key_master() {
+        return private_key_master;
+    }
+
+    public HashMap<String, Element> getKey_couples() {
+        return Key_couples;
+    }
+
+    public ArrayList<String> getIDs() {
+        return IDs;
+    }
+
     protected void New_Set_Up_IBE(){
         generate_PMK_P();
         this.Ppub = (this.P).duplicate().mulZn(this.private_key_master);
@@ -92,7 +129,7 @@ public class IBEscheme {
         for(int i=0; i<a.length; i++){c[i ]= (byte) ((int)a[i]^(int)b[i]);}
             return c;
     }
-    protected IBECipherText Encryption_Basic_IBE(Element P, Element Ppub, String ID, String message){
+    public IBECipherText Encryption_Basic_IBE(Element P, Element Ppub, String ID, String message){
         IBECipherText C = new IBECipherText();
         Element r = pairing.getZr().newRandomElement();
         C.setU(P.duplicate().mulZn(r));
@@ -105,7 +142,7 @@ public class IBEscheme {
         C.setV(XOR(message.getBytes(), C.getV()));
         return C;
     }
-    protected byte[] Decryption_Basic_IBE(Element P, Element Ppub, Element private_key_ID, IBECipherText C){
+    public byte[] Decryption_Basic_IBE(Element P, Element Ppub, Element private_key_ID, IBECipherText C){
         byte[] M2 = pairing.pairing(private_key_ID, C.getU()).toBytes();
         byte[] M = XOR(C.getV(), M2);
         return M;

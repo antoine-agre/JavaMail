@@ -6,6 +6,10 @@ public class IBECipherText {
 
     public IBECipherText() {
     }
+    public IBECipherText(Element U, byte[] V) {
+        this.U = U;
+        this.V = V;
+    }
 
     public Element getU() {
         return U;
