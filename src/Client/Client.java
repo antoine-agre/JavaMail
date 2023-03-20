@@ -65,10 +65,14 @@ public class Client {
             String emailMsg = emailAddress;
             out.write(emailMsg.getBytes());
 
+            out.close();
+
             InputStream dis = urlConn.getInputStream();
+            System.out.println(Integer.parseInt(urlConn.getHeaderField("Content-length")));
             byte[] b = new byte[Integer.parseInt(urlConn.getHeaderField("Content-length"))];
             dis.read(b);
 
+            //TODO Fix Problem with the received string
             String response = new String(b);
             System.out.println("message reçu du serveur:" + response);
 

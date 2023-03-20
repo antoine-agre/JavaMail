@@ -23,6 +23,8 @@ import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.jpbc.PairingParameters;
 import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
 
+import static Cryptography.ElGamal.ElGamal.encrypt;
+
 public class HttpServeur {
 
     static IBEscheme ibe = new IBEscheme();
@@ -60,50 +62,42 @@ public class HttpServeur {
                     PairingParameters pairingParams = PairingFactory.getPairingParameters("params/curves/a.properties");
                     Pairing pairing = PairingFactory.getPairing(pairingParams);
                     Element elGamalPublicKey = pairing.getZr().newElement();
+                    Element generator = pairing.getZr().newRandomElement();
                     elGamalPublicKey.setFromBytes(bytes1);
 
                     System.out.println(elGamalPublicKey);
 
-                    byte[] bytes = "bonjour client ..".getBytes();
-
-                         he.sendResponseHeaders(200, bytes.length);
-
-                         OutputStream os = he.getResponseBody();
-
-                         os.write(bytes);
-                         System.out.println("sending response done....");
-                         os.close();
                     //TODO Verify client ID
-/*
+
                     Element privateKey = ibe.generate_private_key_ID(emailAddress);
 
-                    CipherText encryptedPrivateKey = encrypt(privateKey, keyPair.publicKey(), pairing,generator);
-
+                    CipherText encryptedPrivateKey = encrypt(privateKey, elGamalPublicKey, pairing,generator);
 
                     Element[] PP = ibe.Public_Parameters();
 
 
-                    System.out.println(privateKey.toString());
-                    System.out.println(PP[0].toString());
-                    System.out.println(PP[1].toString());
+                    System.out.println(encryptedPrivateKey);
+                    System.out.println(PP[0]);
+                    System.out.println(PP[1]);
 
 
-                    byte[] privateKeyBytes = privateKey.toString().getBytes();
-                    byte[] P = PP[0].toString().getBytes();
-                    byte[] Ppub = PP[1].toString().getBytes();
+                    byte[] c1 = encryptedPrivateKey.c1().toBytes();
+                    byte[] c2 = encryptedPrivateKey.c2().toBytes();
+                    byte[] P = PP[0].toBytes();
+                    byte[] Ppub = PP[1].toBytes();
 
 
-                    he.sendResponseHeaders(200, privateKeyBytes.length + P.length + PP.length);
-
+                    he.sendResponseHeaders(200, c1.length + c2.length + P.length + Ppub.length);
+                    System.out.println(c1.length + c2.length + P.length + Ppub.length);
                     OutputStream os = he.getResponseBody();
 
-                    os.write(privateKeyBytes);
+                    os.write(c1);
+                    os.write(c2);
                     os.write(P);
                     os.write(Ppub);
                     System.out.println("sending response done....");
                     os.close();
 
- */
                 }
             });
 
