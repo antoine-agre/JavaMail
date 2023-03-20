@@ -31,7 +31,7 @@ public class IBEscheme {
     protected void New_Set_Up_IBE(){
         generate_PMK_P();
         this.Ppub = (this.P).duplicate().mulZn(this.private_key_master);
-        //On reconstruit les clés privé es utilisateurs
+        //On reconstruit les clés privés et utilisateurs
         Key_couples.clear();
         build_HashMap();
     }
@@ -39,7 +39,7 @@ public class IBEscheme {
     //Fonction qui genere la clé privé maitre et gere la lecture dans un fichier
     protected void generate_PMK_P(){
         //Fichier de configuration pour stocker la clé secrète
-        String configFilePath = "/Users/auger/Documents/GitHub/JavaMail/src/Cryptography/IBE/PKM.properties";
+        String configFilePath = "Cryptography/IBE/PKM.properties";
         Properties prop = new Properties();
         InputStream in;
         try {
@@ -55,7 +55,6 @@ public class IBEscheme {
             } catch(IOException e) {e.printStackTrace();}
         }
         else {//Elle est générée et stockée dans un fichier
-            System.out.println("Stockage dans le fichier");
             this.private_key_master = Zr.newRandomElement();
             this.P = G.newRandomElement();
             try{
