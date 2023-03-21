@@ -4,12 +4,12 @@ package Server;/*
  * and open the template in the editor.
  */
 
+import Client.CleClient;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Base64;
@@ -36,6 +36,7 @@ public class HttpServeur {
      * @param emailAddress l'adresse mail sur laquelle le message de verification est envoye
      * @return true si l'identite est verifiee, false sinon
      */
+     
     public static boolean verifyClientId(String emailAddress) {
 
         return true;
@@ -85,15 +86,24 @@ public class HttpServeur {
                         byte[] P = PP[0].toBytes();
                         byte[] Ppub = PP[1].toBytes();
 
+                        CleClient cle = new CleClient(c1, c2, P, Ppub);
 
-                        he.sendResponseHeaders(200, c1.length + c2.length + P.length + Ppub.length);
-                        System.out.println(c1.length + c2.length + P.length + Ppub.length);
+                        File f = File.createTempFile("macle","txt");
+                        FileOutputStream fout = new FileOutputStream(f);
+                        ObjectOutputStream oous = new ObjectOutputStream(fout);
+
+                        oous.writeObject(cle);
+                        oous.flush();
+                        oous.close();
+
+                        FileInputStream fin = new FileInputStream(f);
+                        byte[] filecont = new byte[fin.available()];
+                        fin.read(filecont);
+
+
+                        he.sendResponseHeaders(200, filecont.length);
                         OutputStream os = he.getResponseBody();
-
-                        os.write(c1);
-                        os.write(c2);
-                        os.write(P);
-                        os.write(Ppub);
+                        os.write(filecont);
                         System.out.println("sending response done....");
                         os.close();
                     }
