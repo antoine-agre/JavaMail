@@ -21,6 +21,8 @@ import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
 import it.unisa.dia.gas.plaf.jpbc.util.io.Base64;
 import userInterface.Client;
 
+import static Cryptography.ElGamal.ElGamal.decrypt;
+
 public class HttpClient {
 
     protected String emailAddress;
@@ -57,29 +59,32 @@ public class HttpClient {
         Pairing pairing = PairingFactory.getPairing(pairingParams);
 
         //Fichier de configuration pour stocker la clé secrète
-        String configFilePath = "src/Cryptography/IBE/PKM.properties";
+        String configFilePath = "src/Client/PKID.properties";
         Properties prop = new Properties();
         InputStream in;
         try {
             in = new FileInputStream(configFilePath);
             prop.load(in);
         } catch(IOException e) {e.printStackTrace();}
-        String chaine = prop.getProperty("PKM");
+        String chaine = prop.getProperty("PKID");
         String chaine2 = prop.getProperty("P");
-        if (chaine.length() != 0 && chaine2.length() != 0){//La clé existe et est stocké dans le fichier
+        String chaine3 = prop.getProperty("Ppub");
+        if (chaine.length() != 0 && chaine2.length() != 0 && chaine3.length() != 0){//La clé existe et est stocké dans le fichier
             try{
                 this.ibePrivateKey = pairing.getZr().newElementFromBytes(Base64.decode(chaine));
                 this.P = pairing.getG1().newElementFromBytes(Base64.decode(chaine2));
-                this.Ppub = pairing.getG1().newElementFromBytes(Base64.decode(chaine2));
+                this.Ppub = pairing.getG1().newElementFromBytes(Base64.decode(chaine3));
             } catch(IOException e) {e.printStackTrace();}
         }
         else {//Elle est générée et stockée dans un fichier
             this.ibePrivateKey = pairing.getZr().newRandomElement();
             this.P = pairing.getG1().newRandomElement();
+            this.Ppub = pairing.getG1().newRandomElement();
             try{
                 //On convertit les Elements en string
                 prop.setProperty("PKM", Base64.encodeBytes(this.ibePrivateKey.toBytes()));
                 prop.setProperty("P", Base64.encodeBytes(this.P.toBytes()));
+                prop.setProperty("Ppub", Base64.encodeBytes(this.Ppub.toBytes()));
                 prop.store(new FileOutputStream(configFilePath), null);
             } catch(IOException e) {e.printStackTrace();}
         }
@@ -131,11 +136,12 @@ public class HttpClient {
             Element c2 = pairing.getG1().newElement();
             c2.setFromBytes(cleClient.getC2());
 
-            Element P = pairing.getG1().newElement();
+            P = pairing.getG1().newElement();
             P.setFromBytes(cleClient.getP());
 
-            Element Ppub = pairing.getG1().newElement();
+            Ppub = pairing.getG1().newElement();
             Ppub.setFromBytes(cleClient.getPpub());
+            ibePrivateKey = decrypt(new CipherText(c1, c2), elGamalKeyPair.privateKey());
 
             //TODO Fix Problem with the received string
             String response = new String(b);
