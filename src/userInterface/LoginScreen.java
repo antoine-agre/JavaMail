@@ -26,7 +26,7 @@ public class LoginScreen{
             LoginScreenController controller = loader.getController();
             controller.client = this.client;
 
-            this.scene = new Scene(root, 600, 400);
+            this.scene = new Scene(root, 800, 400);
         } catch (IOException e) {
             e.printStackTrace();
         }

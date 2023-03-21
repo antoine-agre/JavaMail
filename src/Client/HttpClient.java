@@ -48,7 +48,7 @@ public class HttpClient {
 
     public void privateKeyRequest(){
         try {
-            URL SERVER_URL = new URL("http://127.0.1.1:8080/privateKeyRequest");
+            URL SERVER_URL = new URL("http://192.168.230.64:8080/privateKeyRequest");
 
             URLConnection urlConn = SERVER_URL.openConnection();
             urlConn.setDoInput(true);
