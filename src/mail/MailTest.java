@@ -37,7 +37,7 @@ public class MailTest {
         );
 
         File file = new File("/home/issa/Courses/AdvCrypto/JavaMail/EncryptedFiles/file1.txt");
-        handler.sendMail("aaaaaa", "Test de mail", "Test de mail", file);
+        handler.sendMail("testcrypto314@gmail.com", "Test de mail", "Test de mail", file);
 
         System.out.println("Mail envoté");
 

@@ -14,7 +14,8 @@ public class AESFileEncryptor {
     public static void fileEncrypt(File inputFile, File outputFile, String secretKey) throws IOException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         try (FileInputStream inputStream = new FileInputStream(inputFile);
              FileOutputStream outputStream = new FileOutputStream(outputFile)) {
-            byte[] inputBytes = new byte[(int) inputFile.length()];
+
+            byte[] inputBytes = new byte[ inputStream.available()];
             inputStream.read(inputBytes);
 
             byte[] encryptedBytes = AES.encrypt(new String(inputBytes), secretKey.getBytes());
@@ -25,7 +26,7 @@ public class AESFileEncryptor {
     public static void fileDecrypt(File inputFile, File outputFile, String secretKey) throws IOException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         try (FileInputStream inputStream = new FileInputStream(inputFile);
              FileOutputStream outputStream = new FileOutputStream(outputFile)) {
-            byte[] inputBytes = new byte[(int) inputFile.length()];
+            byte[] inputBytes = new byte[ inputStream.available()];
             inputStream.read(inputBytes);
 
             byte[] decryptedBytes = AES.decrypt(inputBytes, secretKey.getBytes()).getBytes();
