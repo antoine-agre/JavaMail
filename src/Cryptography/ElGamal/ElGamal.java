@@ -9,12 +9,12 @@ public class ElGamal {
 
     public static void main(String[] args) {
 
-        PairingParameters pairingParams = PairingFactory.getPairingParameters("Cryptography/params/curves/a.properties");
+        PairingParameters pairingParams = PairingFactory.getPairingParameters("/home/issa/Courses/Advanced Cryptography/JavaMail/src/params/curves/a.properties");
         Pairing pairing = PairingFactory.getPairing(pairingParams);
-        Element generator = pairing.getZr().newRandomElement();
+        Element generator = pairing.getG1().newRandomElement();
 
         KeyPair keyPair = generateKeyPair(pairing,generator);
-        Element message = pairing.getZr().newElement();
+        Element message = pairing.getG1().newRandomElement();
 
 
 
@@ -44,19 +44,19 @@ public class ElGamal {
     }
 
     public static CipherText encrypt(Element message, Element publicKey, Pairing pairing, Element generator) {
-        Element encryptionKey = pairing.getZr().newRandomElement();
+        Element r=pairing.getZr().newRandomElement();
+        Element c2=publicKey.duplicate().mulZn(r);
+        c2.add(message);
+        Element c1=generator.duplicate().mulZn(r);
 
-        Element c1 = generator.duplicate().mulZn(encryptionKey);
-        Element c2 =  message.duplicate().mulZn(publicKey.duplicate().mulZn(encryptionKey).duplicate());
 
-        return new CipherText(c1, c2);
+        return new CipherText(c1, c1);
     }
     public static Element decrypt(CipherText cipherText, Element privateKey) {
 
 
-        Element decryptionKey = cipherText.c1().duplicate().mulZn(privateKey);
-        Element invertDecryptionKey = decryptionKey.duplicate().invert();
-        Element message = invertDecryptionKey.mulZn(cipherText.c2().duplicate());
+        Element m1 = cipherText.c1().duplicate().mulZn(privateKey);
+        Element message = cipherText.c2().duplicate().sub(m1);
 
         return message;
     }
